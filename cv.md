@@ -4,5 +4,5 @@ layout: cv
 actions:
   - label: "Download as PDF"
     icon: pdf
-    url: "#pdf-asset"
+    url: "assets/CV-Thibault-Barillon-202403.pdf"
 ---
