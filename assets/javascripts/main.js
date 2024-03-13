@@ -8,7 +8,6 @@
  * https://github.com/mmistakes/jekyll-theme-basically-basic/blob/master/LICENSE
 */
 
-alert('TEEEEEBOOOOOO');
 var menuItems = document.querySelectorAll('#sidebar li');
 
 // Get vendor transition property
