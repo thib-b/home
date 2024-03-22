@@ -9,7 +9,7 @@
   padding-right: calc(
     10vw + (2 * #{$navicon-width})
   ); /* make room for sidebar toggle */
-  font-family: $base-font-family;
+  font-family: $headline-font-family;
   font-weight: bold;
   line-height: 1;
 
@@ -29,7 +29,7 @@
     -webkit-box-align: center;
     align-items: center;
     min-height: $site-image-height;
-    color: $text-color;
+    color: $accent-color;
     text-decoration: none;
   }
 }
