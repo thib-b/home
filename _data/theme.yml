@@ -1,5 +1,5 @@
 # Theme Skin
-skin: night # default, night, plum, sea, soft, steel
+skin: thib # default, night, plum, sea, soft, steel, thib
 
 # Google Fonts
 google_fonts:
