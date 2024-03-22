@@ -1,9 +1,15 @@
 ---
 layout: post
-title:  "Live Photos - Robocobra Quartet"
+title:  "Photo // Robocobra Quartet - Grand Social, Dublin, February 2024"
 date:   2024-03-22 17:51:10 +0000
 categories: photo
 tags: rq
 ---
 
-![no-alignment]({{ site.url }}{{ site.baseurl }}/assets/images/ColinSARC126.png)
+![no-alignment]({{ site.url }}{{ site.baseurl }}/assets/images/band-grandsocial)
+
+![no-alignment]({{ site.url }}{{ site.baseurl }}/assets/images/pete-grandsocial.png)
+
+![no-alignment]({{ site.url }}{{ site.baseurl }}/assets/images/chris-grandsocial.png)
+
+![no-alignment]({{ site.url }}{{ site.baseurl }}/assets/images/drums-grandsocial.png)
