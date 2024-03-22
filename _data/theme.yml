@@ -5,7 +5,7 @@ skin: thib # default, night, plum, sea, soft, steel, thib
 google_fonts:
   - name: "Lato"
     weights: "400,400i,600,600i"
-  - name: "Elsie"
+  - name: "MuseoModerno"
 
 # Link to specific internal pages in the navigation.
 # Create a custom list to override the default setting of including links to all
