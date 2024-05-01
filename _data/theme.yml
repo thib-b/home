@@ -1,0 +1,20 @@
+# Theme Skin
+skin: thib # default, night, plum, sea, soft, steel, thib
+
+# Google Fonts
+google_fonts:
+  - name: "Lato"
+    weights: "400,400i,600,600i"
+  - name: "MuseoModerno"
+
+# Link to specific internal pages in the navigation.
+# Create a custom list to override the default setting of including links to all
+# pages that have a `title`. Add raw page paths in the order you'd like.
+
+navigation_pages:
+  - posts.md
+  - about.md
+  - cv.md
+  - art.md
+  - photo.md
+  - music.md

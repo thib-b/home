@@ -1,0 +1,134 @@
+{
+  "basics": {
+    "name": "Thibault Barillon",
+    "label": "Senior Product Manager",
+    "picture": "",
+    "email": "v67hyjnw@duck.com",
+    "website": "https://thibault.bar",
+    "summary": "A technically-minded Senior Product Manager passionate about delivering products that bring meaningful value to customers and the broader market. I run on curiosity, empathy and pragmatism to enable customers to successfully deliver their outcomes of today and tomorrow. My interests range from neuroscience, engineering and cybersecurity to art and music (you might know me as 1/6th of Robocobra Quartet).",
+ "location": {
+      "city": "Belfast",
+      "countryCode": "NI"
+    },
+    "profiles": [
+      {
+        "network": "LinkedIn",
+        "username": "thibaultbarillon",
+        "url": "https://www.linkedin.com/in/thibaultbarillon/"
+      }
+          ]
+  },
+  "work": [
+    {
+      "company": "IBM",
+      "position": "Senior Product Manager for SaaS Customer Success",
+      "website": "https://www.ibm.com/security",
+      "startDate": "November 2023",
+      "endDate": "",
+      "summary": " Senior Product Manager focusing on portfolio Transformation to SaaS, with a keen focus on Customer Success and weaving in Gen AI to augment Security Operations. I am currently building and leading a program to understand customer success for IBM Security SaaS offerings, to embed a SaaS First mindset, behaviours and activities in all groups and verticals involved throughout the SaaS customer journey.",
+      "highlights": [
+        "Designed and delivered SIEM migration guide, cornerstone of our GTM strategy for QRadar SIEM (Cloud-Native)",
+        "Built SaaS Customer Success Program from scratch",
+        "Built Gen AI for cybersecurity competitive analysis benchmark for consistent monitoring and planning analysis."
+      ]
+    },
+{
+      "company": "IBM",
+      "position": "Senior Product Manager",
+      "website": "https://www.ibm.com/security",
+      "startDate": "January 2021",
+      "endDate": "November 2023",
+      "summary": " Senior Product Manager at IBM Security for Threat Detection & Response, specialising in SIEM and XDR. I've been principally focused on Product Lifecycle, Strategy and Portfolio Transformation.",
+      "highlights": [
+        "M&A: built business plan for acquisition in EDR space. Contributed to evaluations.",
+        "Lead rejuvenation program for QRadar SIEM, focusing on customer satisfaction, including feature requests (bringing SLAs from 77% to 99%) and MSSP focus",
+        "Mentored 3 junior PM recruits",
+        "Developed and lead IBM Security XDR strategy and operationalised our product portfolio consolidation"
+      ]
+    }
+ ,{
+      "company": "IBM",
+      "position": "Product Manager",
+      "website": "https://www.ibm.com/security",
+      "startDate": "September 2018",
+      "endDate": "January 2021",
+      "summary": " Product Manager for QRadar SIEM, working with multiple distributed teams to bring to market innovations that deliver on customer outcomes.",
+      "highlights": [
+        "Designed, executed and delivered withdrawal of QRadar Vulnerability Assessment capabilities",
+        "Built SME and MSSP targeted roadmap",
+        "Established nd delivered OT/IIoT Security Strategy, with a strong emphasis on GTM"
+      ]
+    }
+,{
+      "company": "IBM",
+      "position": "Development Lead & Product Owner",
+      "website": "https://www.ibm.com/security",
+      "startDate": "January 2017",
+      "endDate": "August 2018",
+      "summary": " Development Lead and Product Owner for IBM QRadar Vulnerability Manager. I focused on leading the team, prioritising features with all stakeholders and advocating for customers. I also prepared architectural options for vetting by the architecture team. High focus on scalability, quality and accuracy, and alternative feature delivery methods to enable continuous delivery outside of platform release cycle. Stack: Java, PostgreSQL, Perl, Docker, Python, bash, RHEL. ",
+      "highlights": []
+    },
+{
+      "company": "IBM",
+      "position": "Senior Software Engineer",
+      "website": "https://www.ibm.com/security",
+      "startDate": "January 2013",
+      "endDate": "December 2016",
+      "summary": "Software Engineer and then Senior Software Engineer on the QRadar Platform. Working on high performance and scalability vulnerability assessment and SIEM for the QRadar platform, as well as building the first version of the App framework for the QRadar platform and designing and building the first developer SDK, for which I received an IBM Outstanding Technical Achievement Award. Stack: Python, Docker, PostgreSQL, RHEL, Java, Perl ",
+      "highlights": []
+    },{
+      "company": "Edenpod/TradeHero (Singapore)",
+      "position": "Software Engineer",
+      "website": "https://finovate.com/ahead-anticipated-ipo-ayondo-acquires-tradehero/",
+      "startDate": "March 2012",
+      "endDate": "September 2012",
+      "summary": "Intern at iOS apps incubator Edenpod in Singapore, working on multiple iOS apps and games. One of them led to spin-off TradeHero, of which I became the second Software Engineer and worked on both iOS client development and building our first server infrasructure using a .NET stack, and building our Continuous Integration pipeline for both front-end and back-end using Jenkins. ",
+      "highlights": []
+    } ],
+
+  "education": [
+    {
+      "institution": "Queen's University Belfast",
+      "area": "Computer Science",
+      "studyType": "Erasmus Semester (MSc)<br><br>-",
+      "startDate": "September 2011",
+      "endDate": "January 2012"
+    },
+    {
+      "institution": "INSA Rennes (France)",
+      "area": "Computer Science",
+      "studyType": "Diplome d'Ingenieur - Masters Degree/MSc in Engineering",
+      "startDate": "September 2017",
+      "endDate": "June 2022"
+    }
+  ],
+  "awards": [
+    {
+      "title": "Album of The Year",
+      "date": "2022",
+      "awarder": "NI Music Prize",
+"summary": "Awarded to **Robocobra Quartet** for _Living Isn't Easy_ (First Taste Records)<br><br>---"
+    },    
+    {
+      "title": "Outstanding Technical Achievement Award (OTAA)",
+      "date": "2016",
+      "awarder": "IBM",
+      "summary": "OTAA for the QRadar App Framework and SDK."
+    }
+  ],
+  "languages": [
+    {
+      "language": "English",
+      "fluency": "Fluent (Primary language)"
+    },
+    {
+      "language": "French",
+      "fluency": "Native Speaker"
+    },
+    {
+      "language":"Spanish",
+      "fluency":"Intermediate"
+    }
+  ]
+}
+

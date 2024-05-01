@@ -1,0 +1,33 @@
+{% assign site_logo = site.logo | relative_url %}
+
+<header id="masthead">
+  <div class="inner">
+
+    <div class="sidebar-toggle-wrapper">
+      <button class="toggle navicon-button larr" type="button">
+        <span class="toggle-inner">
+          <span class="sidebar-toggle-label visually-hidden">{{ site.data.theme.t.menu | default: 'Menu' }}</span>
+          <span class="navicon"></span>
+        </span>
+      </button>
+    </div>
+    
+    <div class="title-area">
+      {% if page.url == '/' %}
+        <h1 class="site-title">
+          <a href="{{ '/' | relative_url }}">
+            {% if site.logo %}<img src="{{ site_logo }}" alt="" class="site-logo">{% endif %}
+            <span>{{ site.title | escape }}</span>
+          </a>
+        </h1>
+      {% else %}
+        <p class="site-title">
+          <a href="{{ '/' | relative_url }}">
+            {% if site.logo %}<img src="{{ site_logo }}" alt="" class="site-logo">{% endif %}
+            <span>{{ site.title | escape }}</span>
+          </a>
+        </p>
+      {% endif %}
+    </div>
+  </div>
+</header>
