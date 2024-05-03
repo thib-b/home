@@ -10,11 +10,8 @@ image: /assets/images/ColinSARC126.png
 introduction: |
    I've made the choice _not_ to split the different things I do into separate, audience-tailored window-fronts for the art, tech, or business worlds and instead let myself cultivate this little virtual allotment.
 
-   Navigation to your left will lead you to portfolio-style content: [CV](/cv), [Music](/music), [Photography](/photo), [Art](/art).
-
+   Navigation to your left will lead you to portfolio-style content: [CV](/cv), [Music](/music), [Photography](/photo), [Art](/art). [About](/about) page has a bit more about myself and licenses/credits.
    Below are blog posts, thoughts, opinions, resources, you know the drill.
-
-   [About](/about) page has a bit more about myself and licenses/credits.
 
    Anyway, here's music featuring yours truly, enjoy!
 
