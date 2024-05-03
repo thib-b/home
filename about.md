@@ -18,7 +18,10 @@ That's all folks! Roll the credits.
 
 *Credits:*
 [Forked](https://github.com/thib-b/home) from [Basically Basic](https://github.com/mmistakes/jekyll-theme-basically-basic) and hosted on GitHub Pages.
+
 Banner Photo by [Colin Armstrong](https://www.phantompoweredpixels.com/).
+
 Music by [Robocobra Quartet](https://www.robocobraquartet.com/)
+
 Unless specified otherwise, any other content is distributed under copyright held by Thibault Barillon.
 
