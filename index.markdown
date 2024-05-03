@@ -10,7 +10,7 @@ image: /assets/images/ColinSARC126.png
 introduction: |
    I've made the choice _not_ to split the different things I do into separate, audience-tailored window-fronts for the art, tech, or business worlds and instead let myself cultivate this little virtual allotment.
 
-   I intend to use this page as an ever-living WIP rather than a final product. Navigation to your left will lead you to portfolio-style content: [CV](/cv), [Music](/music), [Photography](/photo), [Art](/art).
+   Navigation to your left will lead you to portfolio-style content: [CV](/cv), [Music](/music), [Photography](/photo), [Art](/art).
 
    Below are blog posts, thoughts, opinions, resources, you know the drill.
 
