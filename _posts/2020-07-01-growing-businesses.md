@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "SI.com - 2020 // What is How Growing Businesses Should Tackle Cybersecurity Challenges"
+title:  "SI.com - 2020 // How Growing Businesses Should Tackle Cybersecurity Challenges"
 date:   2020-07-01 17:51:10 +0000
 categories: tech
 tags: mssp, infosec 
