@@ -21,7 +21,7 @@
 title: Thibault's Garden 
 email: v67hyjnw@duck.com
 description: >- # this means to ignore newlines until "baseurl:"
-  Thibault Barillon's home site. Software Engineer, Product Manager, Musician, Photographer? (that's a stretch, I know).  
+  Thibault Barillon's home site. Software Engineer, Product Manager, Musician, Photographer?  
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "https://thibault.bar" # the base hostname & protocol for your site, e.g. http://example.com
 author:
