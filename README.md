@@ -1,1 +1,1 @@
-view @ https://thibault.bar
+view @ https://thib.space
