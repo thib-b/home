@@ -1,0 +1,623 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>thib.space</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<style>
+  @property --split{syntax:'<percentage>';inherits:true;initial-value:50%}
+  :root{
+    --both:#B98CE8;
+    --a-bg:#FBFAFD; --a-bg-2:#F1EDF7; --a-ink:#1A1823; --a-ink-2:#463F58; --a-ink-3:#7E768F;
+    --a-line:#E6E0F0; --a-line-2:#D3CAE2; --a-acc:#D8356F; --a-acc-soft:rgba(216,53,111,.12);
+    /* dark side tuned to the neutral near-black of the hero photo's shadows */
+    --t-bg:#17181D; --t-bg-2:#20222A; --t-ink:#F3F1F8; --t-ink-2:#C7C2D2; --t-ink-3:#8B8698;
+    --t-line:#2E2F38; --t-line-2:#3E404B; --t-acc:#2FC4A8; --t-acc-soft:rgba(47,196,168,.12);
+    --ease:cubic-bezier(.66,0,.2,1); --mid:#83828B;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;background:#17181D;color:var(--t-ink);font-family:"Newsreader",Georgia,serif;font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased;overflow:hidden}
+  h1,h2,h3,h4{font-family:"Bricolage Grotesque","Newsreader",serif;font-weight:700;margin:0;line-height:1.08;text-wrap:balance}
+  img{max-width:100%;display:block}
+  a{color:inherit}
+  button{font:inherit}
+
+  .stage{--split:50%;height:100dvh;display:flex;flex-direction:column;
+    background:linear-gradient(90deg,var(--a-bg) 0%,var(--mid) var(--split),var(--t-bg) 100%);
+    transition:--split .85s var(--ease)}
+  .stage.focus-art{--split:88%}
+  .stage.focus-tech{--split:12%}
+
+  /* hero */
+  .hero{flex:none;position:relative;height:302px;overflow:hidden;background:#0b0a10;transition:height .45s cubic-bezier(.66,0,.2,1)}
+  .hero .shot{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 33%;filter:grayscale(.1) contrast(1.02)}
+  .hero .scrim{position:absolute;inset:0;background:linear-gradient(90deg,rgba(9,8,14,.8),rgba(9,8,14,.12) 46%,rgba(9,8,14,.5)),linear-gradient(180deg,rgba(9,8,14,.5),transparent 34%,transparent 52%,rgba(9,8,14,.82))}
+  .hero .wrap{position:absolute;inset:0;padding:20px 34px 28px;display:flex;flex-direction:column;justify-content:space-between;z-index:2}
+  .hero .topbar{display:flex;align-items:center;justify-content:space-between;gap:16px}
+  .hero .brand{font-family:"JetBrains Mono",monospace;font-weight:600;font-size:14px;color:#EDE9F5}
+  .hero .brand .dot{color:var(--a-acc)} .hero .brand .tld{color:#A79FBB}
+  .hero .contact{display:flex;gap:16px;font-family:"JetBrains Mono",monospace;font-size:12px;flex-wrap:wrap}
+  .hero .contact a{color:#D8D2E6;text-decoration:none;transition:.15s}
+  .hero .contact a:hover{color:#fff;text-decoration:underline}
+  .hero h1{font-size:clamp(34px,5.6vw,58px);letter-spacing:-.025em;color:#fff;text-shadow:0 2px 24px rgba(0,0,0,.5)}
+  .hero .summary{margin:12px 0 0;font-size:clamp(15px,1.7vw,18px);line-height:1.5;color:#E7E1EF;max-width:74ch;text-shadow:0 1px 16px rgba(0,0,0,.75)}
+  .hero .summary b{color:#fff;font-weight:500}
+  .hero .mobtabs{display:none}
+  .hero .credit{position:absolute;right:10px;bottom:8px;z-index:2;font-family:"JetBrains Mono",monospace;font-size:8.5px;color:rgba(216,210,230,.5)}
+
+  /* diptych */
+  .diptych{flex:1;min-height:0;display:grid;grid-template-columns:1fr 24px 1fr;transition:grid-template-columns .85s var(--ease)}
+  .stage.focus-art .diptych{grid-template-columns:9fr 24px 1fr}
+  .stage.focus-tech .diptych{grid-template-columns:1fr 24px 9fr}
+  .spine{background:transparent}
+  .pane{position:relative;min-width:0;display:flex;flex-direction:column;overflow:hidden;background:transparent}
+  .pane.art{color:var(--a-ink)} .pane.tech{color:var(--t-ink)}
+
+  .phead{flex:none;position:relative;z-index:4;padding:13px 24px;display:flex;flex-direction:column;gap:10px;transition:opacity .3s}
+  .pane.art .phead{border-bottom:1px solid rgba(120,110,150,.28)} .pane.tech .phead{border-bottom:1px solid rgba(120,110,150,.28)}
+  .phrow{display:flex;align-items:center;justify-content:space-between;gap:14px}
+  .ptitle{font-size:26px;letter-spacing:-.02em}
+  .pane.art .ptitle{color:var(--a-ink);text-shadow:0 1px 12px rgba(251,250,253,.7)}
+  .pane.tech .ptitle{color:#F7F4FC;text-shadow:0 1px 14px rgba(16,15,22,.8)}
+  .phead .sub{margin:0;font-size:13px;max-width:52ch}
+  .pane.art .phead .sub{color:var(--a-ink-2)} .pane.tech .phead .sub{color:var(--t-ink-2);text-shadow:0 1px 10px rgba(16,15,22,.7)}
+  .dl{flex:none;font-family:"JetBrains Mono",monospace;font-size:11.5px;letter-spacing:.02em;text-decoration:none;padding:8px 13px;border-radius:999px;white-space:nowrap;transition:.15s;border:1px solid transparent}
+  .pane.art .dl{color:#fff;background:var(--a-acc)} .pane.art .dl:hover{background:#e4497f}
+  .pane.tech .dl{color:var(--t-acc);border-color:var(--t-line-2);background:rgba(23,24,29,.4)} .pane.tech .dl:hover{border-color:var(--t-acc);background:var(--t-acc-soft)}
+
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{font-family:"JetBrains Mono",monospace;font-size:11px;padding:5px 11px;border-radius:999px;border:1px solid var(--a-line-2);color:var(--a-ink-2);background:rgba(251,250,253,.4);cursor:pointer;transition:.14s}
+  .chip:hover{color:var(--a-ink);border-color:var(--a-ink-3)}
+  .chip[aria-pressed="true"]{color:#fff;background:var(--a-acc);border-color:var(--a-acc)}
+
+  .pbody{flex:1;position:relative;min-height:0}
+  .scroller{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;transition:opacity .3s;scrollbar-width:none;-ms-overflow-style:none}
+  .scroller::-webkit-scrollbar{display:none}
+  .col{padding:30px 34px 60px;max-width:780px}
+  .pane.tech .col{margin-left:auto}
+  .col{text-shadow:0 1px 10px var(--sh)}
+  .pane.art .col{--sh:rgba(251,250,253,.6)} .pane.tech .col{--sh:rgba(23,24,29,.6)}
+  /* when the Art side is expanded, let its media use the extra room (text stays capped) */
+  .stage.focus-art .pane.art .col{max-width:1200px}
+  .stage.focus-art .pane.art .videos .v{max-width:900px}
+  .stage.focus-art .pane.art .gallery{grid-template-columns:repeat(auto-fill,minmax(120px,1fr))}
+  .stage.focus-art .pane.art .gallery.photos{grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+  /* when the Tech side is expanded, use the width: wider column + two-column articles */
+  .stage.focus-tech .pane.tech .col{max-width:1180px}
+  .stage.focus-tech .pane.tech .entry p{max-width:82ch}
+  .stage.focus-tech .pane.tech .article[open] .abody{column-count:2;column-gap:44px}
+  .stage.focus-tech .pane.tech .article[open] .abody p{max-width:none}
+  .stage.focus-tech .pane.tech .article[open] .abody h4,
+  .stage.focus-tech .pane.tech .article[open] .abody .caveat{column-span:all}
+
+  .entry{position:relative;padding:20px 0;border-top:1px solid rgba(120,110,150,.22);display:flex;flex-direction:column;gap:11px}
+  .entry:first-of-type{border-top:none;padding-top:6px}
+  .when{font-family:"JetBrains Mono",monospace;font-size:12px;letter-spacing:.03em;font-variant-numeric:tabular-nums;display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+  .pane.art .when{color:var(--a-ink-3)} .pane.tech .when{color:#A79FBB}
+  .tagpill{font-family:"JetBrains Mono",monospace;font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;border:1px solid;border-radius:999px;padding:2px 7px}
+  .pane.art .tagpill{color:var(--a-ink-2);border-color:var(--a-line-2)} .pane.tech .tagpill{color:var(--t-ink-2);border-color:var(--t-line-2)}
+  .tagpill.now{color:#fff;background:var(--a-acc);border-color:var(--a-acc)} .pane.tech .tagpill.now{background:var(--t-acc);border-color:var(--t-acc);color:#08211c}
+  .entry h3{font-size:20px;letter-spacing:-.01em;max-width:34ch}
+  .entry .role{font-family:"JetBrains Mono",monospace;font-size:13px;font-weight:500}
+  .pane.tech .entry .role{color:var(--t-acc)} .pane.art .entry .role{color:var(--a-acc)}
+  .entry p{margin:0;font-size:15px;line-height:1.55;max-width:60ch}
+  .pane.art .entry p{color:var(--a-ink-2)} .pane.tech .entry p{color:#E3DFEC}
+  .entry p em,.entry cite{font-style:italic}
+  .entry .meta{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--a-ink-3)}
+
+  /* bandcamp players */
+  .bc{border:0;display:block;margin-top:4px}
+  .bc-lg{width:100%;max-width:350px;height:350px;border-radius:8px;overflow:hidden}
+  .bc-album{display:block;margin-top:6px}
+  /* repo preview card */
+  .repocard{display:block;margin-top:6px;max-width:440px;text-decoration:none;text-shadow:none;border:1px solid var(--a-line-2);border-radius:10px;padding:13px 15px;background:rgba(251,250,253,.55);transition:.15s}
+  .repocard:hover{border-color:var(--a-acc);background:rgba(251,250,253,.9)}
+  .repocard .rc-head{font-family:"JetBrains Mono",monospace;font-size:12.5px;color:var(--a-ink);display:flex;align-items:center;gap:8px}
+  .repocard .rc-gh{color:var(--a-acc)}
+  .repocard .rc-path{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .repocard .rc-arr{color:var(--a-ink-3)} .repocard:hover .rc-arr{color:var(--a-acc)}
+  .repocard .rc-sub{font-size:13px;color:var(--a-ink-2);margin-top:7px}
+  .repocard .rc-langs{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+  .repocard .rc-langs span{font-family:"JetBrains Mono",monospace;font-size:10px;color:var(--a-ink-3);border:1px solid var(--a-line-2);border-radius:999px;padding:2px 8px}
+  .bc-sm{width:100%;max-width:420px;height:42px}
+  .players{display:flex;flex-wrap:wrap;gap:18px}
+  .players .rel{flex:1 1 300px;max-width:350px}
+  .players .rel .cap{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--a-ink-3);margin-top:6px}
+  .cred{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.04em;color:var(--a-ink-3)}
+  .pane.art .cred{color:var(--a-acc)}
+
+  /* the 100 feature */
+  .feature{display:grid;grid-template-columns:170px 1fr;gap:18px;align-items:start;margin-top:4px}
+  .feature img{width:170px;height:170px;object-fit:cover;border-radius:10px;border:1px solid var(--a-line-2)}
+  @media (max-width:520px){ .feature{grid-template-columns:1fr} .feature img{width:150px;height:150px} }
+
+  /* live videos */
+  .videos{display:flex;flex-wrap:wrap;gap:14px;margin-top:2px}
+  .videos .v{margin:0;flex:1 1 300px;max-width:520px}
+  .videos .vframe{position:relative;aspect-ratio:16/9;border-radius:8px;overflow:hidden;border:1px solid var(--a-line-2);background:#000}
+  .videos .vframe iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+  .videos .vcap{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--a-ink-3);margin-top:6px}
+  .videos .vcap b{color:var(--a-ink-2);font-weight:600}
+
+  /* link lists (writing) */
+  .links{display:flex;flex-direction:column;gap:8px;margin-top:4px}
+  .links a{font-family:"JetBrains Mono",monospace;font-size:12.5px;text-decoration:none;display:flex;gap:9px;align-items:baseline}
+  .pane.tech .links a{color:var(--t-acc)} .pane.art .links a{color:var(--a-acc)}
+  .links a:hover{text-decoration:underline}
+  .links a .yr{color:var(--t-ink-3);font-variant-numeric:tabular-nums;flex:none}
+  .pane.art .links a .yr{color:var(--a-ink-3)}
+
+  /* self-hosted articles (expandable) */
+  .wrote{font-family:"JetBrains Mono",monospace;font-size:10.5px;letter-spacing:.06em;color:var(--t-ink-3);margin-top:10px}
+  .article{margin-top:8px;border:1px solid var(--t-line-2);border-radius:8px;overflow:hidden;background:rgba(23,24,29,.4)}
+  .article > summary{list-style:none;cursor:pointer;display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:10px 13px}
+  .article > summary::-webkit-details-marker{display:none}
+  .article > summary::after{content:'read →';font-family:"JetBrains Mono",monospace;font-size:10px;color:var(--t-ink-3);flex:none;white-space:nowrap}
+  .article[open] > summary::after{content:'close ×'}
+  .article .atitle{font-family:"JetBrains Mono",monospace;font-size:12.5px;color:var(--t-acc);line-height:1.35}
+  .article .ayr{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--t-ink-3);margin-left:8px}
+  .article .abody{padding:4px 15px 16px;border-top:1px solid var(--t-line);text-shadow:none}
+  .article .abody .caveat{font-family:"JetBrains Mono",monospace;font-size:10.5px;font-style:italic;color:var(--t-ink-3);margin:10px 0 2px}
+  .article .abody h4{font-size:14px;color:#F0EDF6;margin:16px 0 4px;letter-spacing:-.01em}
+  .article .abody p{font-size:13.5px;color:var(--t-ink-2);line-height:1.55;margin:8px 0;max-width:70ch}
+  .article .abody ul{margin:6px 0;padding-left:18px} .article .abody li{font-size:13.5px;color:var(--t-ink-2);margin:2px 0}
+  .article .abody .sig{font-size:11px;color:var(--t-ink-3);font-style:italic;margin-top:14px}
+
+  /* galleries */
+  .gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px;margin-top:2px}
+  .gallery.photos{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
+  .gallery figure{margin:0}
+  .gallery img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:6px;border:1px solid var(--a-line-2);background:var(--a-bg-2)}
+  .gallery.photos img{aspect-ratio:3/2}
+  .gallery figcaption{font-family:"JetBrains Mono",monospace;font-size:9px;color:var(--a-ink-3);margin-top:4px;text-shadow:none}
+  .gallery img{cursor:zoom-in}
+  .lightbox{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;background:rgba(10,9,14,.93);cursor:zoom-out;padding:24px}
+  .lightbox.open{display:flex}
+  .lightbox img{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;border-radius:6px;box-shadow:0 24px 70px rgba(0,0,0,.6)}
+  .lightbox .lbcap{position:absolute;left:0;right:0;bottom:14px;text-align:center;font-family:"JetBrains Mono",monospace;font-size:11px;color:rgba(216,210,230,.7)}
+
+  /* press quotes */
+  .press{display:flex;flex-direction:column;gap:8px;margin-top:2px}
+  .pq{padding:2px 0 2px 16px;border-left:3px solid var(--a-acc);text-shadow:none}
+  .pq p{margin:0;font-size:16px;font-style:italic;color:var(--a-ink);line-height:1.4}
+  .pq cite{display:block;margin-top:3px;font-family:"JetBrains Mono",monospace;font-size:10.5px;font-style:normal;color:var(--a-ink-3)}
+  .pq .stars{color:var(--a-acc);letter-spacing:2px}
+  .press-links{margin-top:11px;font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--a-ink-3);text-shadow:none}
+  .press-links a{color:var(--a-acc);text-decoration:none} .press-links a:hover{text-decoration:underline}
+
+  /* cards (code + award) */
+  .card{margin-top:2px;border:1px solid var(--a-line-2);border-radius:9px;padding:14px 16px;text-shadow:none;backdrop-filter:blur(2px)}
+  .pane.tech .card{border-color:var(--t-line-2)}
+  .card.code{background:rgba(251,250,253,.45)}
+  .card.award{border-left:3px solid var(--a-acc);background:linear-gradient(180deg,rgba(216,53,111,.12),rgba(251,250,253,.4))}
+  .pane.tech .card.award{border-left-color:var(--t-acc);background:linear-gradient(180deg,rgba(47,196,168,.14),rgba(23,24,29,.4))}
+  .card .lbl{font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:.09em;margin-bottom:6px}
+  .card.award .lbl{color:var(--a-acc)} .pane.tech .card.award .lbl{color:var(--t-acc)}
+  .card p{font-size:14px;margin:0}
+  .code .repo{font-family:"JetBrains Mono",monospace;font-size:12.5px;color:var(--a-ink);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .code .repo .gh{color:var(--a-acc)} .code .repo .muted{color:var(--a-ink-3)}
+  .code .row2{display:flex;gap:16px;flex-wrap:wrap;margin-top:8px}
+  .code .row2 .proj{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--a-ink-2)}
+  .code .row2 .proj b{color:var(--a-acc);font-weight:600}
+
+  .origin{padding:26px 0 10px;text-align:center}
+  .origin .odot{width:12px;height:12px;border-radius:50%;background:var(--both);margin:0 auto 10px;box-shadow:0 0 0 5px rgba(185,140,232,.18)}
+  .origin .y{font-family:"Bricolage Grotesque",serif;font-weight:700;font-size:26px}
+  .origin .p{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.12em;margin-top:4px}
+  .pane.art .origin .y{color:var(--a-ink)} .pane.art .origin .p{color:var(--a-ink-3)}
+  .pane.tech .origin .y{color:var(--t-ink)} .pane.tech .origin .p{color:var(--t-ink-3)}
+
+  /* peek */
+  .spinelabel{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;opacity:0;transition:opacity .3s;pointer-events:none}
+  .spinelabel .lab{writing-mode:vertical-rl;transform:rotate(180deg);font-family:"Bricolage Grotesque",serif;font-weight:700;font-size:18px}
+  .spinelabel .chev{font-family:"JetBrains Mono",monospace;font-size:16px;font-weight:600;opacity:.65}
+  .pane.art .spinelabel .lab,.pane.art .spinelabel .chev{color:var(--a-acc)}
+  .pane.tech .spinelabel .lab,.pane.tech .spinelabel .chev{color:var(--t-acc)}
+  .stage.focus-art .pane.tech .scroller,.stage.focus-art .pane.tech .phead,
+  .stage.focus-tech .pane.art .scroller,.stage.focus-tech .pane.art .phead{opacity:0;pointer-events:none}
+  .stage.focus-art .pane.tech .spinelabel,.stage.focus-tech .pane.art .spinelabel{opacity:1}
+
+  :focus-visible{outline:2px solid var(--both);outline-offset:2px;border-radius:4px}
+  @media (prefers-reduced-motion:reduce){ .stage,.diptych,.scroller,.phead,.spinelabel,.hero{transition:none} }
+
+  @media (max-width:820px){
+    .stage{background:#17181D}
+    /* landing: hero fills the screen */
+    .hero{height:100dvh}
+    .hero .wrap{padding:22px 22px 26px}
+    .hero .topbar{flex-wrap:wrap;gap:6px 16px}
+    .hero h1{margin-top:6px} .hero .summary{font-size:15px;margin-top:10px}
+    .hero .mobtabs{display:flex;gap:12px;margin-top:18px}
+    .hero .mobtabs .mtab{flex:1;padding:15px 12px;border-radius:12px;font-family:"JetBrains Mono",monospace;font-size:15px;font-weight:600;cursor:pointer;color:#fff;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.4);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+    .hero .mobtabs .mtab[data-side="art"]{border-color:var(--a-acc)}
+    .hero .mobtabs .mtab[data-side="tech"]{border-color:var(--t-acc)}
+    .diptych{display:none}
+
+    /* a tab is chosen: hero animates to a slim bar with the name + both tabs */
+    .stage.focus-art .hero,.stage.focus-tech .hero{height:62px}
+    .stage.focus-art .hero .scrim,.stage.focus-tech .hero .scrim{background:rgba(18,16,26,.74)}
+    .stage.focus-art .hero .wrap,.stage.focus-tech .hero .wrap{position:absolute;inset:0;flex-direction:row;align-items:center;justify-content:space-between;gap:12px;padding:0 16px}
+    .stage.focus-art .hero .topbar,.stage.focus-tech .hero .topbar,
+    .stage.focus-art .hero .summary,.stage.focus-tech .hero .summary,
+    .stage.focus-art .hero .credit,.stage.focus-tech .hero .credit{display:none}
+    .stage.focus-art .hero h1,.stage.focus-tech .hero h1{font-size:19px;margin:0;cursor:pointer;white-space:nowrap}
+    .stage.focus-art .hero .mobtabs,.stage.focus-tech .hero .mobtabs{margin-top:0;gap:8px;flex:none}
+    .stage.focus-art .hero .mobtabs .mtab,.stage.focus-tech .hero .mobtabs .mtab{flex:0 0 auto;padding:7px 14px;font-size:12.5px;background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.32);color:#fff;-webkit-backdrop-filter:none;backdrop-filter:none}
+    .stage.focus-art .hero .mtab[data-side="art"]{background:var(--a-acc);border-color:var(--a-acc);color:#fff}
+    .stage.focus-tech .hero .mtab[data-side="tech"]{background:var(--t-acc);border-color:var(--t-acc);color:#08211c}
+
+    .stage.focus-art .diptych,.stage.focus-tech .diptych{display:flex}
+    .diptych .spine{display:none}
+    .stage.focus-art .pane.tech,.stage.focus-tech .pane.art{display:none}
+    .diptych .pane{flex:1 1 auto;min-width:0}
+    .pane.art{background:var(--a-bg)} .pane.tech{background:var(--t-bg)}
+    .col{text-shadow:none!important;padding:24px 20px 44px;max-width:none} .pane.tech .col{margin-left:0}
+    .ptitle{text-shadow:none!important}
+    .spinelabel{display:none}
+  }
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <header class="hero">
+    <img class="shot" src="/assets/images/the100/hero.jpg" alt="Thibault Barillon on stage with a saxophone, backlit through haze">
+    <div class="scrim"></div>
+    <div class="wrap">
+      <div class="topbar">
+        <div class="brand">thib<span class="dot">.</span><span class="tld">space</span></div>
+        <nav class="contact">
+          <a href="mailto:thibault.barillon@protonmail.com">Email</a>
+          <a href="https://www.linkedin.com/in/thibaultbarillon/" target="_blank" rel="noopener">LinkedIn</a>
+          <a href="https://github.com/thib-b" target="_blank" rel="noopener">GitHub</a>
+        </nav>
+      </div>
+      <div>
+        <h1>Thibault Barillon</h1>
+        <p class="summary">I'm Thibault, a trained engineer turned Product Manager with expertise in cybersecurity, as well as a creative most notable for my saxophone work as part of <b>Robocobra Quartet</b>, but I also tinker with acrylic, living art, and code art.</p>
+      </div>
+      <div class="mobtabs">
+        <button class="mtab" data-side="art">Art</button>
+        <button class="mtab" data-side="tech">Tech</button>
+      </div>
+    </div>
+    <div class="credit">photo · Colin Armstrong</div>
+  </header>
+
+  <div class="diptych" id="diptych">
+
+    <!-- ===================== ART ===================== -->
+    <section class="pane art" id="pane-art" aria-label="Art">
+      <div class="phead">
+        <div class="phrow">
+          <h2 class="ptitle">Art</h2>
+          <a class="dl" href="https://robocobraquartet.com" target="_blank" rel="noopener">robocobraquartet.com ↗</a>
+        </div>
+      </div>
+      <div class="pbody">
+        <div class="scroller" id="scroll-art">
+          <div class="col">
+
+            <article class="entry" data-cat="code">
+              <div class="when">Aug 2026 <span class="tagpill">Code</span></div>
+              <h3>Mould-growth simulation using Python and headless Blender for music visualisation</h3>
+              <a class="repocard" href="https://github.com/thib-b/rq-100pieces-viz" target="_blank" rel="noopener">
+                <div class="rc-head"><span class="rc-gh">◆</span><span class="rc-path">github.com/thib-b/rq-100pieces-viz</span><span class="rc-arr">↗</span></div>
+                <div class="rc-sub">A Python interface driving Blender to generate music-visualisation videos for Robocobra Quartet.</div>
+                <div class="rc-langs"><span>Python</span><span>Blender</span></div>
+              </a>
+            </article>
+
+            <article class="entry" data-cat="code">
+              <div class="when">2026 <span class="tagpill">Code</span></div>
+              <h3>New robocobraquartet.com site for album campaign (with PixiJS mould-growth simulations)</h3>
+              <a class="repocard" href="https://github.com/thib-b/the100lab" target="_blank" rel="noopener">
+                <div class="rc-head"><span class="rc-gh">◆</span><span class="rc-path">github.com/thib-b/the100lab</span><span class="rc-arr">↗</span></div>
+                <div class="rc-sub">Robocobra Quartet's new website — generative art in PixiJS emulating mould growing on agar.</div>
+                <div class="rc-langs"><span>Astro</span><span>TypeScript</span><span>PixiJS</span></div>
+              </a>
+            </article>
+
+            <article class="entry" data-cat="music">
+              <div class="when">2026 <span class="tagpill">Live</span></div>
+              <h3>Live from the Sonic Lab</h3>
+              <div class="cred">Writing · saxophones · film edited by me</div>              <div class="videos"><div class="v"><div class="vframe"><iframe src="https://www.youtube-nocookie.com/embed/5SgVmEZ6MVA" title="Robocobra Quartet — Live from the Sonic Lab" loading="lazy" allowfullscreen></iframe></div><div class="vcap"><b>Sonic Lab, SARC</b> · Belfast</div></div></div>
+            </article>
+
+            <article class="entry" data-cat="code">
+              <div class="when">2025 — now <span class="tagpill">Code</span></div>
+              <h3>thib.space</h3>
+              <a class="repocard" href="https://github.com/thib-b/home" target="_blank" rel="noopener">
+                <div class="rc-head"><span class="rc-gh">◆</span><span class="rc-path">github.com/thib-b/home</span><span class="rc-arr">↗</span></div>
+                <div class="rc-sub">This site.</div>
+                <div class="rc-langs"><span>HTML</span><span>CSS</span><span>JS</span></div>
+              </a>
+            </article>
+
+            <article class="entry" data-cat="photo">
+              <div class="when">2024 <span class="tagpill">Photography</span></div>
+              <h3>Live photo — Robocobra Quartet — Grand Social, Dublin — 24 Feb 2024</h3>
+              <div class="gallery photos">
+                <figure><img src="/assets/images/band-grandsocial.jpg" alt="Robocobra Quartet live" loading="lazy"><figcaption>Grand Social, Dublin</figcaption></figure>
+                <figure><img src="/assets/images/pete-grandsocial.jpg" alt="Live photo" loading="lazy"><figcaption>Grand Social</figcaption></figure>
+                <figure><img src="/assets/images/chris-grandsocial.jpg" alt="Live photo" loading="lazy"><figcaption>Grand Social</figcaption></figure>
+                <figure><img src="/assets/images/drums-grandsocial.jpg" alt="Live photo" loading="lazy"><figcaption>Grand Social</figcaption></figure>
+              </div>
+            </article>
+
+            <article class="entry" data-cat="visual">
+              <div class="when">2023 <span class="tagpill">Visual</span></div>
+              <h3>Acrylic Marker on Canvas</h3>
+              <div class="gallery">
+                <figure><img src="/assets/art/art01.jpg" alt="Marker piece01" loading="lazy"><figcaption>Piece 01</figcaption></figure>
+                <figure><img src="/assets/art/art02.jpg" alt="Marker piece02" loading="lazy"><figcaption>Piece 02</figcaption></figure>
+                <figure><img src="/assets/art/art03.jpg" alt="Marker piece03" loading="lazy"><figcaption>Piece 03</figcaption></figure>
+                <figure><img src="/assets/art/art04.jpg" alt="Marker piece04" loading="lazy"><figcaption>Piece 04</figcaption></figure>
+                <figure><img src="/assets/art/art05.jpg" alt="Marker piece05" loading="lazy"><figcaption>Piece 05</figcaption></figure>
+                <figure><img src="/assets/art/art06.jpg" alt="Marker piece06" loading="lazy"><figcaption>Piece 06</figcaption></figure>
+                <figure><img src="/assets/art/art07.jpg" alt="Marker piece07" loading="lazy"><figcaption>Piece 07</figcaption></figure>
+                <figure><img src="/assets/art/art08.jpg" alt="Marker piece08" loading="lazy"><figcaption>Piece 08</figcaption></figure>
+                <figure><img src="/assets/art/art09.jpg" alt="Marker piece09" loading="lazy"><figcaption>Piece 09</figcaption></figure>
+                <figure><img src="/assets/art/art10.jpg" alt="Marker piece10" loading="lazy"><figcaption>Piece 10</figcaption></figure>
+              </div>
+            </article>
+
+            <article class="entry" data-cat="music">
+              <div class="when">17 June 2022 <span class="tagpill">LP</span></div>
+              <h3>Living Isn't Easy</h3>
+              <div class="cred">Writing · saxophones · Robocobra Quartet</div>              <iframe class="bc-album" style="border:0;width:400px;height:439px;max-width:100%" src="https://bandcamp.com/EmbeddedPlayer/album=4004019889/size=large/bgcol=ffffff/linkcol=0687f5/artwork=small/transparent=true/" seamless loading="lazy"><a href="https://robocobraquartet.bandcamp.com/album/living-isnt-easy">Living Isn't Easy by Robocobra Quartet</a></iframe>
+              <div class="press">
+                <blockquote class="pq"><p>"A storied triumph"</p><cite><span class="stars">★★★★</span> · MOJO</cite></blockquote>
+                <blockquote class="pq"><p>"Thank god for Robocobra Quartet"</p><cite><span class="stars">★★★★</span> · The Irish Times</cite></blockquote>
+                <blockquote class="pq"><p>"Belfast jazz agitators hit career-best"</p><cite><span class="stars">★★★★</span> · The Line of Best Fit</cite></blockquote>
+              </div>
+              <div class="press-links">Reviews: <a href="https://www.irishtimes.com/culture/music/review/2022/06/17/robocobra-quartet-living-isnt-easy-the-outer-limits-of-anti-capitalist-irish-jazz/" target="_blank" rel="noopener">The Irish Times ↗</a> · <a href="https://www.jazzwise.com/reviews/robocobra-quartet-living-isnt-easy" target="_blank" rel="noopener">Jazzwise ↗</a> · <a href="https://www.loudandquiet.com/reviews/robocobra-quartet-living-isnt-easy/" target="_blank" rel="noopener">Loud &amp; Quiet ↗</a></div>
+            </article>
+
+            <article class="entry" data-cat="music">
+              <div class="when">2022 <span class="tagpill now">Award</span></div>
+              <h3>NI Music Prize — Album of the Year</h3>
+              <div class="card award">
+                <div class="lbl">◆ Northern Ireland Music Prize · 2022</div>
+                <p>Awarded to <em>Living Isn't Easy</em>.</p>
+              </div>
+              <div class="press-links">Coverage: <a href="https://www.hotpress.com/culture/ni-music-prize-delivers-a-brilliantly-successful-night-celebrating-music-from-northern-ireland-22938897" target="_blank" rel="noopener">Hot Press ↗</a></div>
+            </article>
+
+            <article class="entry" data-cat="music">
+              <div class="when">2022 <span class="tagpill">Live</span></div>
+              <h3>Live at Glastonbury</h3>
+              <div class="cred">Writing · saxophones · Robocobra Quartet</div>              <div class="videos"><div class="v"><div class="vframe"><iframe src="https://www.youtube-nocookie.com/embed/2NagizpLmpg" title="Robocobra Quartet — Live at Glastonbury 2022" loading="lazy" allowfullscreen></iframe></div><div class="vcap"><b>Glastonbury</b> · full set</div></div></div>
+            </article>
+
+            <article class="entry" data-cat="music">
+              <div class="when">2021 <span class="tagpill">Live tape</span></div>
+              <h3>Live Tape 1</h3>
+              <div class="cred">Writing · saxophones · Robocobra Quartet</div>
+              <iframe class="bc-album" style="border:0;width:400px;height:439px;max-width:100%" src="https://bandcamp.com/EmbeddedPlayer/album=430996976/size=large/bgcol=ffffff/linkcol=0687f5/artwork=small/transparent=true/" seamless loading="lazy"><a href="https://robocobraquartet.bandcamp.com/album/live-tape-1">Live Tape 1 by Robocobra Quartet</a></iframe>
+            </article>
+
+            <article class="entry" data-cat="music">
+              <div class="when">2019 <span class="tagpill">Live</span></div>
+              <h3>Bar 37 Will Shock You!</h3>
+              <div class="cred">Writing · saxophones · Robocobra Quartet</div>              <div class="videos"><div class="v"><div class="vframe"><iframe src="https://www.youtube-nocookie.com/embed/P27dWZhb2es" title="Robocobra Quartet — Bar 37 Will Shock You! (Live from the Sonic Lab)" loading="lazy" allowfullscreen></iframe></div><div class="vcap"><b>Sonic Lab, SARC</b> · Belfast</div></div></div>
+            </article>
+
+            <article class="entry" data-cat="music">
+              <div class="when">2019 <span class="tagpill">Live</span></div>
+              <h3>You'll Wade — live on the BBC</h3>
+              <div class="cred">Writing · saxophones · Robocobra Quartet</div>
+              <div class="videos"><div class="v"><div class="vframe"><iframe src="https://www.youtube-nocookie.com/embed/DhZn80-KOww" title="Robocobra Quartet — You'll Wade (Live on BBC)" loading="lazy" allowfullscreen></iframe></div><div class="vcap"><b>BBC session</b></div></div></div>
+            </article>
+
+            <article class="entry" data-cat="music">
+              <div class="when">25 May 2018 <span class="tagpill">LP</span></div>
+              <h3>Plays Hard to Get</h3>
+              <div class="cred">Writing · saxophones · Robocobra Quartet</div>
+              <iframe class="bc-album" style="border:0;width:400px;height:439px;max-width:100%" src="https://bandcamp.com/EmbeddedPlayer/album=1794945171/size=large/bgcol=ffffff/linkcol=0687f5/artwork=small/transparent=true/" seamless loading="lazy"><a href="https://robocobraquartet.bandcamp.com/album/plays-hard-to-get">Plays Hard to Get by Robocobra Quartet</a></iframe>
+              <div class="press-links">Reviews: <a href="https://narcmagazine.com/album-review-robocobra-quartet-plays-hard-to-get/" target="_blank" rel="noopener">Narc Magazine ↗</a> · <a href="https://drownedinsound.com/releases/20348/reviews/4151829" target="_blank" rel="noopener">Drowned in Sound ↗</a> · <a href="https://thethinair.net/2018/06/robocobra-quartet-plays-hard-to-get-2/" target="_blank" rel="noopener">The Thin Air ↗</a></div>
+            </article>
+
+            <article class="entry" data-cat="music">
+              <div class="when">18 November 2016 <span class="tagpill">LP</span></div>
+              <h3>Music for All Occasions</h3>
+              <div class="cred">Writing · saxophones · Robocobra Quartet</div>
+              <iframe class="bc-album" style="border:0;width:400px;height:439px;max-width:100%" src="https://bandcamp.com/EmbeddedPlayer/album=1594229768/size=large/bgcol=ffffff/linkcol=0687f5/artwork=small/transparent=true/" seamless loading="lazy"><a href="https://robocobraquartet.bandcamp.com/album/music-for-all-occasions">Music for All Occasions by Robocobra Quartet</a></iframe>
+              <div class="press-links">Reviews: <a href="https://narcmagazine.com/album-review-robocobra-quartet-music-for-all-occasions/" target="_blank" rel="noopener">Narc Magazine ↗</a> · <a href="https://thequietus.com/quietus-reviews/robocobra-quartet-music-for-all-occasions-album-review/" target="_blank" rel="noopener">The Quietus ↗</a></div>
+            </article>
+
+            <article class="entry" data-cat="music">
+              <div class="when">2015 <span class="tagpill">EPs</span></div>
+              <h3>Iwazaru Mizaru &amp; Bomber EP</h3>
+              <div class="cred">Writing · saxophones · Robocobra Quartet</div>
+              <div class="players">
+                <div class="rel"><iframe class="bc bc-sm" src="https://bandcamp.com/EmbeddedPlayer/album=1920300837/size=small/bgcol=ffffff/linkcol=d8356f/transparent=true/" seamless loading="lazy" title="Iwazaru Mizaru"></iframe><div class="cap">Iwazaru Mizaru · 2015</div></div>
+                <div class="rel"><iframe class="bc bc-sm" src="https://bandcamp.com/EmbeddedPlayer/album=267661904/size=small/bgcol=ffffff/linkcol=d8356f/transparent=true/" seamless loading="lazy" title="Bomber EP"></iframe><div class="cap">Bomber EP · 2015</div></div>
+              </div>
+            </article>
+
+            <article class="entry" data-cat="music">
+              <div class="when">2015 <span class="tagpill">Live</span></div>
+              <h3>Live at The Black Box</h3>
+              <div class="cred">Writing · saxophones · Robocobra Quartet</div>              <div class="videos"><div class="v"><div class="vframe"><iframe src="https://www.youtube-nocookie.com/embed/VzAK7nEcBcI" title="Robocobra Quartet — Live at The Black Box" loading="lazy" allowfullscreen></iframe></div><div class="vcap"><b>The Black Box</b> · Belfast</div></div></div>
+            </article>
+
+            <div class="origin"><div class="odot"></div><div class="y">1990</div><div class="p">Born · Nantes, France</div></div>
+          </div>
+        </div>
+        <div class="spinelabel"><span class="lab">Art</span><span class="chev">›</span></div>
+      </div>
+    </section>
+
+    <div class="spine" aria-hidden="true"></div>
+
+    <!-- ===================== TECH ===================== -->
+    <section class="pane tech" id="pane-tech" aria-label="Tech">
+      <div class="phead">
+        <div class="phrow">
+          <h2 class="ptitle">Tech</h2>
+          <a class="dl" href="https://www.linkedin.com/in/thibaultbarillon/" target="_blank" rel="noopener">LinkedIn ↗</a>
+        </div>
+        <p class="sub">Fifteen years building security products — the short version.</p>
+      </div>
+      <div class="pbody">
+        <div class="scroller" id="scroll-tech">
+          <div class="col">
+
+            <article class="entry">
+              <div class="when">2025 — now <span class="tagpill now">Current</span></div>
+              <div class="role">Principal Product Manager · Contrast Security</div>
+              <p>Runtime application security — ADR, which catches attacks inside live applications. I own the integrations portfolio: getting that attack evidence into the SIEM, SOC and AI tools security teams already use. In the first year I shipped eight SIEM integrations and a universal event forwarder I'd proposed; more recently, the developer experience for the next-generation platform's public APIs. (Senior PM 2025, Principal since 2026.)</p>
+            </article>
+
+            <article class="entry">
+              <div class="when">2023 – 2024</div>
+              <div class="role">Senior Product Manager, SaaS Program · IBM Security</div>
+              <p>Product lead for IBM Security's SaaS transformation across the SIEM and XDR portfolio.</p>
+            </article>
+
+            <article class="entry">
+              <div class="when">2021 – 2023</div>
+              <div class="role">Senior Product Manager · IBM Security</div>
+              <p>Strategy and lifecycle for the threat-detection portfolio. Drove consolidation onto a single cloud-native platform, and a QRadar SIEM turnaround that lifted commitments on customer feature requests from 77% to 99%.</p>
+              <div class="wrote">Wrote:</div>
+              <details class="article">
+                <summary><span><span class="atitle">What is XDR?</span><span class="ayr">2021</span></span></summary>
+                <div class="abody">
+                  <p class="caveat">Originally published on securityintelligence.com, 12 October 2021.</p>
+                  <p>Extended detection and response (XDR) is a security solution that delivers end-to-end visibility, detection, investigation and response across multiple security layers. Core components of an XDR architecture include federation of security signals, higher-level behavioral and cross-correlated analytics, and closed-loop and highly automated responses. This creates a truly unified experience supported by a solutions architecture that equals more than the sum of its parts. Security teams are able to get more value from an XDR that meets the following criteria:</p>
+                  <ul><li>Supports open standards</li><li>Delivers advanced analytics</li><li>Provides a simpler, unified analyst experience</li><li>Streamlines operations</li><li>Enhances response through automation</li></ul>
+                  <p>An XDR solution can achieve improved visibility across an organization's networks, endpoints, SIEM and more via open-system integration. Open standards can help move the industry away from expensive and wasteful 'rip and replace' programs. Instead, an open approach helps organizations get more out of their existing investments.</p>
+                  <p>An XDR solution can also offer more automation and AI enrichments at all levels of detection, analytics, investigation and response. Automation throughout the threat life cycle can dramatically reduce mean time to detect (MTTD) and mean time to recovery (MTTR). Not only does reducing these metrics have a direct relationship to mitigating the cost of a data breach, it also frees up time for analysts to do more human-led activities like investigation. An XDR solution also bolsters investigation with a unified view of threat activity, a single search and investigation experience and consistent enrichment with threat intelligence and domain expertise.</p>
+                  <h4>Is XDR just another acronym or a fundamental market shift?</h4>
+                  <p>For many decades now, emerging threats have put organizations at risk. As the IT landscape evolved and threat actors found new ways to attack, security teams needed to find new ways to detect and respond to threats.</p>
+                  <p>Today, this evolving theme of complexity continues. And the list of point solutions being deployed to overcome these burgeoning threats goes on and on — from SIEM, to cloud workload protection, to endpoint detection and response (EDR), to network detection and response (NDR) and more. While these investments each do their part to solve immediate and dire issues, in combination they've created a bigger challenge: how to use and get value from them together.</p>
+                  <p>This is why we call them point tools; they were made to address specific challenges. Now that security teams face a myriad of challenges, it's never been more critical to have them work in concert. Without doing so, limited security operations resources will continue to be spread thin, total cost of ownership will continue to increase, and pinpointing and responding to threats will continue to be time-consuming and inefficient.</p>
+                  <p>Extended detection and response is the beginning of a shift towards uniting multiple siloed solutions and reducing the complexity that impedes fast detection and response. Gartner identified XDR as the number-one security and risk trend at the end of 2020, suggesting now is the moment when all this complexity — too many tools, too many alerts, too little time — is coming to a head, with XDR as a response.</p>
+                  <h4>What are the different approaches to XDR?</h4>
+                  <p>Industry analysts have outlined two approaches: native and hybrid. Native XDR is a suite that integrates with a vendor's own solutions to collect telemetry and execute response actions. Hybrid or open XDR is a platform that integrates with various vendors and third parties to do the same.</p>
+                  <p>Vendors have been taking different approaches to what is under the hood of XDR. Does XDR = EDR plus additional capabilities? Or EDR plus NDR, or some other combination? It may be too soon to tell where the market lands as the technology is nascent, but the delineation between native and hybrid XDR is one thing the industry seems to agree on.</p>
+                  <h4>How does XDR 'extend' SIEM?</h4>
+                  <p>For some readers, SIEM may have immediately come to mind. There are key differences. In XDR, correlation and alerting tend to be fully automated, employing use cases provided and tuned by the vendor, and incident response focuses on highly repeatable actions that can be automated — sending a suspicious file to a sandbox, enriching an alert with threat intelligence, blocking an email sender tied to phishing. This differs from SOAR, which can be broadly customized with playbooks and used to unite people as well as technology.</p>
+                  <p>XDR can extend the detection and response capabilities enabled today by SIEM. In fact, SIEM can play an integral role in an XDR architecture, gathering, organizing and assessing massive amounts of data for SOC analysts; XDR builds on the data and events flowing through it. When you receive analytics from a SIEM, endpoints and networks separately, it can be like having three different witnesses to an attack — XDR brings all three together into one complete story.</p>
+                  <h4>How does XDR compare to MDR?</h4>
+                  <p>Even as XDR vendors strive to untangle the complexity problem, it will take time. Compounding the challenge is the skills shortage: the need for talent to run analysis and investigations leads many organizations to use a partner for managed detection and response (MDR) services.</p>
+                  <p>MDR is an approach to managing sophisticated detection and response tools — via endpoint, network or SIEM technology — often with proactive threat hunting and 24/7 SOC coverage. As one analyst put it, "XDR success still seems to be based on human expertise," making MDR an invaluable companion to XDR for customers who could use a helping hand.</p>
+                  <h4>How does XDR support customers with zero-trust aspirations?</h4>
+                  <p>Zero trust is a framework that starts with an assumption of compromise, then continuously validates the conditions for connection between users, data and resources to determine authorization and need. XDR provides an essential function to zero trust by continuously monitoring for incidents and responding in the most targeted way possible to avoid disruption to the business.</p>
+                  <p>Instead of placing blind trust in a system and saying the controls are enough, with XDR you constantly monitor the places where things could go wrong — which is exactly why identity tools such as identity and access management (IAM) play a critical role tying into XDR architectures.</p>
+                  <h4>What should customers look for in an XDR solution?</h4>
+                  <p>Your XDR should be an open, extensible solution that lets your organization get more from its existing investments. Look for third-party integrations that spare you a costly rip-and-replace, and cloud-native solutions for cloud visibility. XDR goes far beyond an improved EDR; it should be the end game for threat detection and response, as part of a unified platform.</p>
+                  <p>Ultimately, XDR makes it easier for the people managing and responding to threats every day to do the work. Advanced analytics, constantly updated threat intelligence and a streamlined experience free analysts to spend their time on investigations, not gathering data. People and culture are the keys to the SOC, and by uniting threat-detection data and tools, XDR enables the collaboration and openness that helps teams thrive.</p>
+                  <p class="sig">Offering Manager, Threat Detection &amp; Response — IBM Security</p>
+                </div>
+              </details>
+            </article>
+
+            <article class="entry">
+              <div class="when">2018 – 2021</div>
+              <div class="role">Product Manager · IBM Security</div>
+              <p>Roadmap for QRadar SIEM and Vulnerability Manager. Ran the withdrawal of QRadar's vulnerability-assessment capability — ~600 customers migrated to Tenable and Qualys with zero escalations — and kicked off an OT / industrial-IoT security strategy.</p>
+              <div class="wrote">Wrote:</div>
+              <details class="article">
+                <summary><span><span class="atitle">How Growing Businesses Should Tackle Cybersecurity Challenges</span><span class="ayr">2020</span></span></summary>
+                <div class="abody">
+                  <p class="caveat">Originally published on securityintelligence.com, 1 July 2020.</p>
+                  <p>When we think about the most public cyber attacks and data breaches, we generally associate them with large enterprises. The truth is cyber attacks are not limited by company size. A significant cyber attack can happen to any company, in any industry and of any size.</p>
+                  <p>According to the 2019 Cost of a Data Breach report by the Ponemon Institute, "small businesses face disproportionately larger costs relative to larger organizations when it comes to breaches."</p>
+                  <p>Typically, one of the most valuable assets for any sized company is its data, and data theft or destruction is probably the most frequent result of cyber attacks on small and medium businesses (SMB). SMBs can be very profitable targets for bad actors, because they have fewer resources and little in-house expertise to plan, implement and execute a cybersecurity incident response plan. Business drivers and modernization needs make it an even trickier balancing act with the norm of working from home.</p>
+                  <p>So how can SMBs protect themselves against costly cyber attacks? The short answer is by selecting a security information and event management (SIEM) platform that will detect threats before they can wreak havoc. However, not all SIEMs are built to address the unique needs of SMBs, which are particularly vulnerable to the following use cases.</p>
+                  <h4>Phishing</h4>
+                  <p>Phishing is a concern for security teams across the world, and smaller organizations are as likely to be targeted as larger corporations. Look for a SIEM platform with built-in phishing detection and remediation, so SMBs know employees are protected on this vital communications channel.</p>
+                  <h4>Insider threats</h4>
+                  <p>Insider threats are another key use case, particularly with the shift to remote work. Privileged accounts, contractors and employees are everyday vectors for attackers, often via compromised credentials. When monitoring for malicious or accidental insider threats, user behavior analytics (UBA) is key to understanding the risks associated with the activity of various users in an organization.</p>
+                  <h4>Ransomware</h4>
+                  <p>Ransomware is a low-risk, low-cost, high-profitability option for attackers, so it is no surprise it's so prevalent. It is the number-one most likely threat to cause a 24-hour outage at SMBs. Out-of-the-box ransomware detection is a must, protecting an organization from paying a ransom and from the costly loss of availability.</p>
+                  <h4>The power of AI</h4>
+                  <p>One of the toughest challenges security teams face is the cybersecurity skills shortage. Organizations can take advantage of the cognitive capabilities of AI to enhance the knowledge available to their professionals — gathering and enriching context through analysis of structured and unstructured data, and reducing investigation time from hours to minutes. By separating the wheat from the chaff, analysts spend less time on low-priority incidents and more time preventing breaches or reducing their impact through timely response.</p>
+                  <h4>MSSPs</h4>
+                  <p>SMBs don't need to be alone in their fight against cybercrime; for many, the answer is a managed security services provider (MSSP) with a dedicated focus on threat detection, investigation and response. An MSSP can efficiently implement the capabilities above and mature use cases across its whole customer base while customizing as required.</p>
+                  <p>Leveraging modern frameworks such as MITRE ATT&amp;CK, SMBs and their MSSP partners can assess, implement and grow their security posture using a common language for threat actors, tactics and techniques — and benefit from threat-intelligence feeds, automation and AI tools that would be tough to deploy with limited resources. By partnering with the right MSSP, SMBs can safely focus on developing and transforming their businesses.</p>
+                  <p class="sig">Offering Manager, Threat Detection &amp; Response — IBM Security</p>
+                </div>
+              </details>
+            </article>
+
+            <article class="entry">
+              <div class="when">2017 – 2018</div>
+              <div class="role">Development Lead &amp; Product Owner · IBM Security</div>
+              <p>Engineering lead and product owner for the QRadar Vulnerability Manager team (eight engineers).</p>
+            </article>
+
+            <article class="entry">
+              <div class="when">2013 – 2016 <span class="tagpill">Award</span></div>
+              <div class="role">Software Engineer, then Senior · IBM Security</div>
+              <p>The QRadar platform. Built the first QRadar App SDK and the publishing path third-party developers still use — now well past half a million downloads.</p>
+              <div class="card award">
+                <div class="lbl">◆ IBM Outstanding Technical Achievement Award · 2016</div>
+                <p>For the QRadar App Framework and SDK.</p>
+              </div>
+            </article>
+
+            <article class="entry">
+              <div class="when">2012</div>
+              <div class="role">Software Engineer · TradeHero, Singapore</div>
+              <p>Second engineer (fourth employee) at a fintech spin-off out of an iOS incubator, later acquired. Built the first server infrastructure and the CI pipeline.</p>
+            </article>
+
+            <article class="entry">
+              <div class="when">2007 – 2012 <span class="tagpill">Study</span></div>
+              <div class="role">Diplôme d'Ingénieur (MSc) · INSA Rennes</div>
+              <p>A general-then-specialised engineering degree in France, with an Erasmus semester at Queen's University Belfast (2011–12), and I've been based in Belfast since.</p>
+            </article>
+
+            <div class="origin"><div class="odot"></div><div class="y">1990</div><div class="p">Born · Nantes, France</div></div>
+          </div>
+        </div>
+        <div class="spinelabel"><span class="lab">Tech</span><span class="chev">‹</span></div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+  const stage=document.getElementById('stage');
+  const dip=document.getElementById('diptych');
+  const mob=()=>window.matchMedia('(max-width:820px)').matches;
+  let focusT=0;
+  function setFocus(side,immediate){
+    clearTimeout(focusT);
+    const apply=()=>{stage.classList.remove('focus-art','focus-tech');if(side)stage.classList.add('focus-'+side);};
+    if(immediate)apply();else focusT=setTimeout(apply,140);
+  }
+  const paneArt=document.getElementById('pane-art'),paneTech=document.getElementById('pane-tech');
+  paneArt.addEventListener('mouseenter',()=>{if(!mob())setFocus('art');});
+  paneTech.addEventListener('mouseenter',()=>{if(!mob())setFocus('tech');});
+  document.getElementById('scroll-art').addEventListener('wheel',()=>{if(!mob())setFocus('art',true);},{passive:true});
+  document.getElementById('scroll-tech').addEventListener('wheel',()=>{if(!mob())setFocus('tech',true);},{passive:true});
+  dip.addEventListener('mouseleave',()=>{if(!mob())setFocus(null);});
+
+  // mobile: hero landing + tab buttons (desktop is unaffected — hover/wheel above)
+  document.querySelectorAll('.mobtabs .mtab').forEach(b=>b.addEventListener('click',()=>{
+    setFocus(b.dataset.side,true);
+    const sc=document.getElementById('scroll-'+b.dataset.side); if(sc)sc.scrollTop=0;
+  }));
+  document.querySelector('.hero h1').addEventListener('click',()=>{if(mob())setFocus(null,true);});
+
+  // click any gallery image to expand it full-frame
+  const lb=document.createElement('div');lb.className='lightbox';
+  const lbimg=document.createElement('img');const lbcap=document.createElement('div');lbcap.className='lbcap';
+  lb.append(lbimg,lbcap);document.body.appendChild(lb);
+  const closeLb=()=>lb.classList.remove('open');
+  document.querySelectorAll('.gallery img').forEach(im=>im.addEventListener('click',e=>{
+    e.stopPropagation();lbimg.src=im.src;lbimg.alt=im.alt;
+    const fc=im.parentElement.querySelector('figcaption');lbcap.textContent=fc?fc.textContent:'';
+    lb.classList.add('open');
+  }));
+  lb.addEventListener('click',closeLb);
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')closeLb();});
+</script>
+</body>
+</html>
