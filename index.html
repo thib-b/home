@@ -1002,7 +1002,7 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements-dev.txt
     const rnd=(a=1,b=0)=>b+Math.random()*(a-b);
     const pick=a=>a[(Math.random()*a.length)|0];
     const INK='#f6f4ef';                 // warm off-white, matching the hero title
-    const STEP=1000/60, MAXSUB=5, DUR=1800;   // ~30s reveal at 60fps, wall-clock paced
+    const STEP=1000/60, MAXSUB=5, DUR=3600;   // ~60s reveal at 60fps, wall-clock paced
     let W=0,H=0,dpr=1,mask=null,edges=[],veins=[],seeded=0,age=0,g=0,fontSize=48;
     let raf=0,running=false,done=false,started=false,collapsed=false,last=0,acc=0,rt=0;
 
