@@ -289,12 +289,15 @@
   @media (max-width:820px){
     .veil,.display{display:none}   /* Phase 2 is desktop-only; mobile keeps inline behaviour */
     .stage{background:#17181D}
-    /* landing: hero fills the screen */
-    .hero{height:100dvh}
+    /* landing: hero fills the *visible* screen. svh = smallest (address-bar-shown) viewport,
+       so the tabs never fall below the fold; dvh is the fallback for older browsers. */
+    .hero{height:100dvh;height:100svh}
     .hero .wrap{padding:22px 22px 26px}
-    .hero .topbar{flex-wrap:wrap;gap:6px 16px}
-    .hero h1{margin-top:6px} .hero .summary{font-size:15px;margin-top:10px}
-    .hero .mobtabs{display:flex;gap:12px;margin-top:18px}
+    .hero .topbar{flex:none;flex-wrap:wrap;gap:6px 16px}
+    /* middle block takes the slack and shrinks if needed, keeping topbar and tabs in view */
+    .hero .heromid{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;justify-content:center;overflow:hidden}
+    .hero h1{margin-top:0} .hero .summary{font-size:15px;margin-top:10px}
+    .hero .mobtabs{display:flex;flex:none;gap:12px;margin-top:18px}
     .hero .mobtabs .mtab{flex:1;padding:15px 12px;border-radius:12px;font-family:"JetBrains Mono",monospace;font-size:15px;font-weight:600;cursor:pointer;color:#fff;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.4);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
     .hero .mobtabs .mtab[data-side="art"]{border-color:var(--a-acc)}
     .hero .mobtabs .mtab[data-side="tech"]{border-color:var(--t-acc)}
@@ -339,7 +342,7 @@
           <a href="https://github.com/thib-b" target="_blank" rel="noopener">GitHub</a>
         </nav>
       </div>
-      <div>
+      <div class="heromid">
         <div class="namewrap"><h1>Thibault Barillon</h1><canvas class="name-reveal" aria-hidden="true"></canvas></div>
         <p class="summary">I'm Thibault, a trained engineer turned Product Manager with expertise in cybersecurity, as well as a creative most notable for my saxophone work as part of <b>Robocobra Quartet</b>, but I also tinker with acrylic, living art, and code art.</p>
       </div>
@@ -1073,15 +1076,24 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements-dev.txt
 
     // collapse back to plain text when a mobile tab is chosen (hero shrinks to the slim bar)
     document.querySelectorAll('.mobtabs .mtab').forEach(b=>b.addEventListener('click',collapse));
-    addEventListener('resize',()=>{ clearTimeout(rt); rt=setTimeout(()=>{
-      if(collapsed||mob())return;
-      veins=[]; seeded=0; age=done?DUR:0; g=done?1:0; const wasDone=done; done=false;
-      if(!build()){ return; } h1.classList.add('canvas-active');
-      if(wasDone||reduce){ settleNow(); } else { last=0; acc=0; running=false; kick(); }
-    },160); });
 
-    if(document.fonts&&document.fonts.ready){ document.fonts.ready.then(begin); setTimeout(begin,1200); }
-    else setTimeout(begin,300);
+    // Rebuild the mask whenever the name's box changes — window resize, orientation, and the
+    // mobile address bar showing/hiding (which resizes the 100svh hero and moves the title).
+    // Progress (age/g) is preserved: it re-seeds to the current point and keeps growing.
+    function rebuild(){
+      if(collapsed||!started) return;
+      const wasDone=done;
+      veins=[]; seeded=0; done=false; running=false;
+      if(!build()) return;                 // fail() draws the plain <h1> fallback
+      h1.classList.add('canvas-active');
+      if(wasDone||reduce){ settleNow(); } else { last=0; acc=0; kick(); }
+    }
+    if('ResizeObserver' in window){ new ResizeObserver(()=>{ clearTimeout(rt); rt=setTimeout(rebuild,160); }).observe(h1); }
+    addEventListener('resize',()=>{ clearTimeout(rt); rt=setTimeout(rebuild,160); });
+
+    const boot=()=>requestAnimationFrame(begin);
+    if(document.fonts&&document.fonts.ready){ document.fonts.ready.then(boot); setTimeout(boot,1200); }
+    else setTimeout(boot,300);
   })();
 </script>
 </body>
