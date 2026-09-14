@@ -45,6 +45,10 @@
   .hero .contact a{color:#D8D2E6;text-decoration:none;transition:.15s}
   .hero .contact a:hover{color:#fff;text-decoration:underline}
   .hero h1{font-size:clamp(34px,5.6vw,58px);letter-spacing:-.025em;color:#fff;text-shadow:0 2px 24px rgba(0,0,0,.5)}
+  /* mould-growth name reveal: a canvas grows the name in place over the (transparent) h1 */
+  .hero .namewrap{position:relative;display:block}
+  .hero .name-reveal{position:absolute;left:0;top:0;pointer-events:none;z-index:1}
+  .hero h1.canvas-active{color:transparent}
   .hero .summary{margin:12px 0 0;font-size:clamp(15px,1.7vw,18px);line-height:1.5;color:#E7E1EF;max-width:74ch;text-shadow:0 1px 16px rgba(0,0,0,.75)}
   .hero .summary b{color:#fff;font-weight:500}
   .hero .mobtabs{display:none}
@@ -304,6 +308,7 @@
     .stage.focus-art .hero .summary,.stage.focus-tech .hero .summary,
     .stage.focus-art .hero .credit,.stage.focus-tech .hero .credit{display:none}
     .stage.focus-art .hero h1,.stage.focus-tech .hero h1{font-size:19px;margin:0;cursor:pointer;white-space:nowrap}
+    .stage.focus-art .hero .name-reveal,.stage.focus-tech .hero .name-reveal{display:none}   /* slim bar shows plain text */
     .stage.focus-art .hero .mobtabs,.stage.focus-tech .hero .mobtabs{margin-top:0;gap:8px;flex:none}
     .stage.focus-art .hero .mobtabs .mtab,.stage.focus-tech .hero .mobtabs .mtab{flex:0 0 auto;padding:7px 14px;font-size:12.5px;background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.32);color:#fff;-webkit-backdrop-filter:none;backdrop-filter:none}
     .stage.focus-art .hero .mtab[data-side="art"]{background:var(--a-acc);border-color:var(--a-acc);color:#fff}
@@ -335,7 +340,7 @@
         </nav>
       </div>
       <div>
-        <h1>Thibault Barillon</h1>
+        <div class="namewrap"><h1>Thibault Barillon</h1><canvas class="name-reveal" aria-hidden="true"></canvas></div>
         <p class="summary">I'm Thibault, a trained engineer turned Product Manager with expertise in cybersecurity, as well as a creative most notable for my saxophone work as part of <b>Robocobra Quartet</b>, but I also tinker with acrylic, living art, and code art.</p>
       </div>
       <div class="mobtabs">
@@ -980,6 +985,104 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements-dev.txt
   document.querySelectorAll('.dclose').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();unpin();}));
   window.addEventListener('resize',()=>{if(mob()&&pinned)unpin();});
   document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeLb();if(pinned)unpin();}});
+
+  /* ---- mould-growth name reveal (adapted from the Robocobra Quartet stamp vein-reveal) ----
+     The name is rasterised to an offscreen mask; veins then grow inside the letterforms,
+     seeding progressively until the name fills in. Same look as the RQ "stamp" treatment,
+     with the PNG mask swapped for text. Falls back to the plain <h1> on reduced-motion or
+     if canvas pixel readback is blocked. */
+  (function(){
+    const h1=document.querySelector('.hero h1');
+    const cv=document.querySelector('.name-reveal');
+    if(!h1||!cv) return;
+    const ctx=cv.getContext('2d');
+    const mk=document.createElement('canvas');
+    const mx=mk.getContext('2d',{willReadFrequently:true});
+    const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+    const rnd=(a=1,b=0)=>b+Math.random()*(a-b);
+    const pick=a=>a[(Math.random()*a.length)|0];
+    const INK='#f6f4ef';                 // warm off-white, matching the hero title
+    const STEP=1000/60, MAXSUB=5, DUR=1800;   // ~30s reveal at 60fps, wall-clock paced
+    let W=0,H=0,dpr=1,mask=null,edges=[],veins=[],seeded=0,age=0,g=0,fontSize=48;
+    let raf=0,running=false,done=false,started=false,collapsed=false,last=0,acc=0,rt=0;
+
+    function fontOf(){
+      const s=getComputedStyle(h1);
+      return {font:s.fontWeight+' '+s.fontSize+' '+s.fontFamily, size:parseFloat(s.fontSize),
+              lh:parseFloat(s.lineHeight)||parseFloat(s.fontSize)*1.08, ls:s.letterSpacing};
+    }
+    function wrap(text,maxW,F){
+      mx.font=F.font; if('letterSpacing' in mx){try{mx.letterSpacing=F.ls;}catch(e){}}
+      const words=text.split(/\s+/); let lines=[],cur='';
+      for(const w of words){ const t=cur?cur+' '+w:w; if(cur&&mx.measureText(t).width>maxW){lines.push(cur);cur=w;} else cur=t; }
+      if(cur)lines.push(cur); return lines;
+    }
+    function fail(){ h1.classList.remove('canvas-active'); cv.style.display='none'; done=true; running=false; started=true; }
+
+    function build(){
+      const r=h1.getBoundingClientRect();
+      W=Math.max(2,Math.round(r.width)); H=Math.max(2,Math.round(r.height));
+      dpr=Math.min(devicePixelRatio||1,2);
+      cv.width=mk.width=W*dpr; cv.height=mk.height=H*dpr;
+      cv.style.width=W+'px'; cv.style.height=H+'px';
+      ctx.setTransform(dpr,0,0,dpr,0,0); ctx.lineCap='round'; ctx.clearRect(0,0,W,H);
+      ctx.shadowColor='rgba(0,0,0,.45)'; ctx.shadowBlur=1.5;   // keep veins legible over the photo
+      mx.setTransform(dpr,0,0,dpr,0,0); mx.clearRect(0,0,W,H);
+      const F=fontOf(); fontSize=F.size;
+      mx.font=F.font; mx.textBaseline='top'; mx.fillStyle='#fff';
+      if('letterSpacing' in mx){try{mx.letterSpacing=F.ls;}catch(e){}}
+      const lines=wrap(h1.textContent.trim(),W,F), blockH=lines.length*F.lh, oy=Math.max(0,(H-blockH)/2);
+      for(let i=0;i<lines.length;i++) mx.fillText(lines[i],0,oy+i*F.lh+(F.lh-F.size)*0.28);
+      let data;
+      try{ data=mx.getImageData(0,0,W*dpr,H*dpr).data; }catch(e){ data=null; }
+      if(!data){ fail(); return false; }
+      mask=data; edges=[];
+      const spx=Math.max(2,Math.round(2*dpr));
+      const A=(px,py)=>{ px=(px*dpr)|0; py=(py*dpr)|0; if(px<0||py<0||px>=W*dpr||py>=H*dpr) return 0; return mask[(py*W*dpr+px)*4+3]; };
+      for(let y=0;y<H;y+=spx/dpr) for(let x=0;x<W;x+=spx/dpr){
+        if(A(x,y)>80){ const d=spx/dpr+1; if(A(x-d,y)<80||A(x+d,y)<80||A(x,y-d)<80||A(x,y+d)<80) edges.push({x,y}); }
+      }
+      if(!edges.length){ fail(); return false; }
+      return true;
+    }
+    function inMask(x,y){ if(!mask)return false; const px=(x*dpr)|0,py=(y*dpr)|0; if(px<0||py<0||px>=W*dpr||py>=H*dpr) return false; return mask[(py*W*dpr+px)*4+3]>80; }
+    function seed(){ const p=pick(edges); veins.push({x:p.x,y:p.y,ang:rnd(6.2832),life:rnd(58,28),w:rnd(0.9,0.4)}); }
+    function stepVeins(){
+      const sp=Math.max(0.55,fontSize*0.02), target=Math.round(edges.length*1.25*g);
+      while(seeded<target){ seed(); seeded++; }
+      for(let i=veins.length-1;i>=0;i--){ const t=veins[i];
+        t.ang+=rnd(0.75,-0.75);
+        const nx=t.x+Math.cos(t.ang)*sp, ny=t.y+Math.sin(t.ang)*sp;
+        if(inMask(nx,ny)){ ctx.strokeStyle=INK; ctx.globalAlpha=rnd(0.55,0.3); ctx.lineWidth=t.w*rnd(1.3,0.7);
+          ctx.beginPath(); ctx.moveTo(t.x,t.y); ctx.lineTo(nx,ny); ctx.stroke(); t.x=nx; t.y=ny; }
+        else { if(Math.random()<0.5){ ctx.strokeStyle=INK; ctx.globalAlpha=rnd(0.3,0.12); ctx.lineWidth=t.w*0.8; ctx.beginPath(); ctx.moveTo(t.x,t.y); ctx.lineTo(nx,ny); ctx.stroke(); } t.ang=rnd(6.2832); t.life-=3; }
+        if(--t.life<=0) veins.splice(i,1);
+      }
+      ctx.globalAlpha=1;
+    }
+    function settled(){ return g>=1 && veins.length===0 && seeded>=Math.round(edges.length*1.25); }
+    function grow(){ age++; g=Math.min(1,age/DUR); stepVeins(); }
+    function loop(now){ if(!last)last=now; let dt=now-last; last=now; if(dt>250)dt=STEP; acc+=dt; let n=0;
+      while(acc>=STEP&&n<MAXSUB){ grow(); acc-=STEP; n++; } if(n===MAXSUB)acc=0;
+      if(settled()){ running=false; done=true; return; } raf=requestAnimationFrame(loop); }
+    function kick(){ if(running||done)return; running=true; last=0; acc=0; cancelAnimationFrame(raf); raf=requestAnimationFrame(loop); }
+    function settleNow(){ g=1; age=DUR; for(let k=0;k<24000&&!settled();k++) stepVeins(); done=true; }
+
+    function begin(){ if(started||collapsed)return; started=true; if(!build())return; h1.classList.add('canvas-active'); if(reduce)settleNow(); else kick(); }
+    function collapse(){ collapsed=true; cancelAnimationFrame(raf); running=false; done=true; h1.classList.remove('canvas-active'); }
+
+    // collapse back to plain text when a mobile tab is chosen (hero shrinks to the slim bar)
+    document.querySelectorAll('.mobtabs .mtab').forEach(b=>b.addEventListener('click',collapse));
+    addEventListener('resize',()=>{ clearTimeout(rt); rt=setTimeout(()=>{
+      if(collapsed||mob())return;
+      veins=[]; seeded=0; age=done?DUR:0; g=done?1:0; const wasDone=done; done=false;
+      if(!build()){ return; } h1.classList.add('canvas-active');
+      if(wasDone||reduce){ settleNow(); } else { last=0; acc=0; running=false; kick(); }
+    },160); });
+
+    if(document.fonts&&document.fonts.ready){ document.fonts.ready.then(begin); setTimeout(begin,1200); }
+    else setTimeout(begin,300);
+  })();
 </script>
 </body>
 </html>
