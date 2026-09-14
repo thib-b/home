@@ -209,11 +209,81 @@
   .pane.art .spinelabel .lab,.pane.art .spinelabel .chev{color:var(--a-acc)}
   .pane.tech .spinelabel .lab,.pane.tech .spinelabel .chev{color:var(--t-acc)}
 
+  /* ============ Phase 2: hover-preview / click-pin display canvas ============ */
+  /* the neglected pane doubles as a display surface for the hovered item on the active side */
+  .display{position:absolute;inset:0;z-index:7;opacity:0;pointer-events:none;transition:opacity .5s linear}
+  .stage.focus-art  .pane.tech.has-view .display,
+  .stage.focus-tech .pane.art.has-view  .display{opacity:1}
+  .pane.tech .display{color:var(--a-ink)}   /* right canvas fades to light (art palette) */
+  .pane.art  .display{color:var(--t-ink)}   /* left  canvas fades to dark  (tech palette) */
+  .dscroll{position:absolute;inset:0;overflow:hidden;padding:30px 40px 46px;scrollbar-width:thin}
+  .dscroll::-webkit-scrollbar{width:8px}
+  .dscroll::-webkit-scrollbar-thumb{background:rgba(130,120,150,.4);border-radius:8px}
+  .dbody{max-width:680px;margin:0 auto}
+  .dfade{position:absolute;left:0;right:0;bottom:0;height:64px;z-index:2;pointer-events:none;transition:opacity .3s}
+  .pane.tech .dfade{background:linear-gradient(180deg,transparent,var(--a-bg))}
+  .pane.art  .dfade{background:linear-gradient(180deg,transparent,var(--t-bg))}
+  .dhint{position:absolute;right:18px;bottom:14px;z-index:3;font-family:"JetBrains Mono",monospace;font-size:10.5px;letter-spacing:.04em;opacity:.55;pointer-events:none}
+  .dclose{position:absolute;right:16px;top:14px;z-index:4;display:none;width:30px;height:30px;border-radius:50%;
+    border:1px solid currentColor;background:transparent;color:inherit;cursor:pointer;font-size:15px;line-height:1;opacity:.65;transition:.15s}
+  .dclose:hover{opacity:1}
+  .stage.pinned .pane.pinned .display{pointer-events:auto}
+  .stage.pinned .pane.pinned .dscroll{overflow-y:auto}
+  .stage.pinned .pane.pinned .dclose{display:block}
+  .stage.pinned .pane.pinned .dfade,.stage.pinned .pane.pinned .dhint{display:none}
+
+  /* view: magnified image */
+  .dv-img{display:flex;flex-direction:column;gap:12px;align-items:center;justify-content:center;min-height:66vh}
+  .stage.pinned .pane.pinned .dv-img{min-height:0;justify-content:flex-start}
+  .dv-img img{max-width:100%;max-height:80vh;width:auto;border-radius:8px;border:1px solid var(--a-line-2);box-shadow:0 18px 50px rgba(20,16,30,.18)}
+  .dv-cap{font-family:"JetBrains Mono",monospace;font-size:11.5px;color:var(--a-ink-3);text-align:center}
+
+  /* view: article (rendered on the dark left canvas) */
+  .dv-head{font-family:"Bricolage Grotesque","Newsreader",serif;font-weight:700;font-size:23px;letter-spacing:-.01em;margin:0 0 6px;color:#F0EDF6}
+  .dv-head .dv-yr{font-family:"JetBrains Mono",monospace;font-size:13px;font-weight:500;color:var(--t-ink-3);margin-left:8px}
+  .dv-article .caveat{font-family:"JetBrains Mono",monospace;font-size:10.5px;font-style:italic;color:var(--t-ink-3);margin:8px 0 2px}
+  .dv-article h4{font-size:16px;color:#F0EDF6;margin:18px 0 6px;letter-spacing:-.01em}
+  .dv-article p{font-size:15px;color:var(--t-ink-2);line-height:1.62;margin:10px 0;max-width:64ch}
+  .dv-article ul{margin:8px 0;padding-left:20px} .dv-article li{font-size:15px;color:var(--t-ink-2);margin:3px 0}
+  .dv-article .sig{font-size:12px;color:var(--t-ink-3);font-style:italic;margin-top:16px}
+
+  /* view: press review (rendered on the light right canvas) */
+  .dv-review .dv-outlet{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--a-acc);margin-bottom:2px}
+  .dv-review h3{font-size:23px;margin:2px 0 4px;letter-spacing:-.01em;color:var(--a-ink)}
+  .dv-review .dv-alb{font-family:"JetBrains Mono",monospace;font-size:11.5px;color:var(--a-ink-3);margin-bottom:16px}
+  .dv-review p{font-size:15.5px;line-height:1.62;color:var(--a-ink-2);margin:0 0 13px;max-width:60ch}
+  .dv-review .dv-src{margin-top:8px;font-family:"JetBrains Mono",monospace;font-size:11.5px;color:var(--a-ink-3)}
+  .dv-review .dv-src a{color:var(--a-acc);text-decoration:none} .dv-review .dv-src a:hover{text-decoration:underline}
+
+  /* view: README / markdown (rendered on the light right canvas) */
+  .dv-md{font-size:15px;line-height:1.6;color:var(--a-ink-2)}
+  .dv-md .dv-repohead{font-family:"JetBrains Mono",monospace;font-size:12px;margin-bottom:16px;display:flex;gap:8px;align-items:center;color:var(--a-ink-3)}
+  .dv-md .dv-repohead a{color:var(--a-acc);text-decoration:none} .dv-md .dv-repohead a:hover{text-decoration:underline}
+  .dv-md h1{font-family:"Bricolage Grotesque",serif;font-size:24px;color:var(--a-ink);margin:0 0 10px;letter-spacing:-.01em}
+  .dv-md h2{font-family:"Bricolage Grotesque",serif;font-size:17px;color:var(--a-ink);margin:24px 0 8px}
+  .dv-md h3{font-size:14px;color:var(--a-ink);margin:16px 0 6px;font-family:"JetBrains Mono",monospace}
+  .dv-md p{margin:10px 0;max-width:70ch}
+  .dv-md ul,.dv-md ol{margin:8px 0;padding-left:20px} .dv-md li{margin:4px 0}
+  .dv-md a{color:var(--a-acc);text-decoration:none} .dv-md a:hover{text-decoration:underline}
+  .dv-md code{font-family:"JetBrains Mono",monospace;font-size:12.5px;background:var(--a-bg-2);border:1px solid var(--a-line);border-radius:4px;padding:1px 5px}
+  .dv-md pre{background:var(--a-bg-2);border:1px solid var(--a-line);border-radius:8px;padding:12px 14px;overflow-x:auto;margin:12px 0}
+  .dv-md pre code{background:none;border:0;padding:0;font-size:12px;line-height:1.5;white-space:pre}
+  .dv-md table{border-collapse:collapse;margin:12px 0;font-size:13px;display:block;overflow-x:auto;max-width:100%}
+  .dv-md th,.dv-md td{border:1px solid var(--a-line-2);padding:6px 10px;text-align:left;vertical-align:top}
+  .dv-md th{background:var(--a-bg-2);font-family:"JetBrains Mono",monospace;font-size:11px;white-space:nowrap}
+  .dv-md strong{color:var(--a-ink);font-weight:600}
+  .dv-md blockquote{border-left:3px solid var(--a-line-2);margin:10px 0;padding:2px 0 2px 14px;color:var(--a-ink-3)}
+
+  /* desktop affordance: source items are interactive */
+  @media (hover:hover) and (min-width:821px){
+    .repocard,.gallery img,.article > summary,.press-links a[data-review]{cursor:pointer}
+  }
+
   :focus-visible{outline:2px solid var(--both);outline-offset:2px;border-radius:4px}
-  @media (prefers-reduced-motion:reduce){ .stage,.diptych,.scroller,.phead,.spinelabel,.hero{transition:none} }
+  @media (prefers-reduced-motion:reduce){ .stage,.diptych,.scroller,.phead,.spinelabel,.hero,.display{transition:none} }
 
   @media (max-width:820px){
-    .veil{display:none}
+    .veil,.display{display:none}   /* Phase 2 is desktop-only; mobile keeps inline behaviour */
     .stage{background:#17181D}
     /* landing: hero fills the screen */
     .hero{height:100dvh}
@@ -294,7 +364,7 @@
             <article class="entry" data-cat="code">
               <div class="when">Aug 2026 <span class="tagpill">Code</span></div>
               <h3>Mould-growth simulation using Python and headless Blender for music visualisation</h3>
-              <a class="repocard" href="https://github.com/thib-b/rq-100pieces-viz" target="_blank" rel="noopener">
+              <a class="repocard" href="https://github.com/thib-b/rq-100pieces-viz" target="_blank" rel="noopener" data-readme="md-rq-viz">
                 <div class="rc-head"><span class="rc-gh">◆</span><span class="rc-path">github.com/thib-b/rq-100pieces-viz</span><span class="rc-arr">↗</span></div>
                 <div class="rc-sub">A Python interface driving Blender to generate music-visualisation videos for Robocobra Quartet.</div>
                 <div class="rc-langs"><span>Python</span><span>Blender</span></div>
@@ -364,7 +434,7 @@
                 <blockquote class="pq"><p>"Thank god for Robocobra Quartet"</p><cite><span class="stars">★★★★</span> · The Irish Times</cite></blockquote>
                 <blockquote class="pq"><p>"Belfast jazz agitators hit career-best"</p><cite><span class="stars">★★★★</span> · The Line of Best Fit</cite></blockquote>
               </div>
-              <div class="press-links">Reviews: <a href="https://www.irishtimes.com/culture/music/review/2022/06/17/robocobra-quartet-living-isnt-easy-the-outer-limits-of-anti-capitalist-irish-jazz/" target="_blank" rel="noopener">The Irish Times ↗</a> · <a href="https://www.jazzwise.com/reviews/robocobra-quartet-living-isnt-easy" target="_blank" rel="noopener">Jazzwise ↗</a> · <a href="https://www.loudandquiet.com/reviews/robocobra-quartet-living-isnt-easy/" target="_blank" rel="noopener">Loud &amp; Quiet ↗</a></div>
+              <div class="press-links">Reviews: <a href="https://www.irishtimes.com/culture/music/review/2022/06/17/robocobra-quartet-living-isnt-easy-the-outer-limits-of-anti-capitalist-irish-jazz/" target="_blank" rel="noopener" data-review="rv-it-lie">The Irish Times ↗</a> · <a href="https://www.jazzwise.com/reviews/robocobra-quartet-living-isnt-easy" target="_blank" rel="noopener">Jazzwise ↗</a> · <a href="https://www.loudandquiet.com/reviews/robocobra-quartet-living-isnt-easy/" target="_blank" rel="noopener" data-review="rv-lq-lie">Loud &amp; Quiet ↗</a></div>
             </article>
 
             <article class="entry" data-cat="music">
@@ -408,7 +478,7 @@
               <h3>Plays Hard to Get</h3>
               <div class="cred">Writing · saxophones · Robocobra Quartet</div>
               <iframe class="bc-album" style="border:0;width:400px;height:439px;max-width:100%" src="https://bandcamp.com/EmbeddedPlayer/album=1794945171/size=large/bgcol=ffffff/linkcol=0687f5/artwork=small/transparent=true/" seamless loading="lazy"><a href="https://robocobraquartet.bandcamp.com/album/plays-hard-to-get">Plays Hard to Get by Robocobra Quartet</a></iframe>
-              <div class="press-links">Reviews: <a href="https://narcmagazine.com/album-review-robocobra-quartet-plays-hard-to-get/" target="_blank" rel="noopener">Narc Magazine ↗</a> · <a href="https://drownedinsound.com/releases/20348/reviews/4151829" target="_blank" rel="noopener">Drowned in Sound ↗</a> · <a href="https://thethinair.net/2018/06/robocobra-quartet-plays-hard-to-get-2/" target="_blank" rel="noopener">The Thin Air ↗</a></div>
+              <div class="press-links">Reviews: <a href="https://narcmagazine.com/album-review-robocobra-quartet-plays-hard-to-get/" target="_blank" rel="noopener" data-review="rv-narc-phtg">Narc Magazine ↗</a> · <a href="https://drownedinsound.com/releases/20348/reviews/4151829" target="_blank" rel="noopener" data-review="rv-dis-phtg">Drowned in Sound ↗</a> · <a href="https://thethinair.net/2018/06/robocobra-quartet-plays-hard-to-get-2/" target="_blank" rel="noopener">The Thin Air ↗</a></div>
             </article>
 
             <article class="entry" data-cat="music">
@@ -416,7 +486,7 @@
               <h3>Music for All Occasions</h3>
               <div class="cred">Writing · saxophones · Robocobra Quartet</div>
               <iframe class="bc-album" style="border:0;width:400px;height:439px;max-width:100%" src="https://bandcamp.com/EmbeddedPlayer/album=1594229768/size=large/bgcol=ffffff/linkcol=0687f5/artwork=small/transparent=true/" seamless loading="lazy"><a href="https://robocobraquartet.bandcamp.com/album/music-for-all-occasions">Music for All Occasions by Robocobra Quartet</a></iframe>
-              <div class="press-links">Reviews: <a href="https://narcmagazine.com/album-review-robocobra-quartet-music-for-all-occasions/" target="_blank" rel="noopener">Narc Magazine ↗</a> · <a href="https://thequietus.com/quietus-reviews/robocobra-quartet-music-for-all-occasions-album-review/" target="_blank" rel="noopener">The Quietus ↗</a></div>
+              <div class="press-links">Reviews: <a href="https://narcmagazine.com/album-review-robocobra-quartet-music-for-all-occasions/" target="_blank" rel="noopener">Narc Magazine ↗</a> · <a href="https://thequietus.com/quietus-reviews/robocobra-quartet-music-for-all-occasions-album-review/" target="_blank" rel="noopener" data-review="rv-quietus-mfao">The Quietus ↗</a></div>
             </article>
 
             <article class="entry" data-cat="music">
@@ -439,6 +509,12 @@
           </div>
         </div>
         <div class="spinelabel"><span class="lab">Art</span><span class="chev">›</span></div>
+      </div>
+      <div class="display" aria-hidden="true">
+        <button class="dclose" aria-label="Close">✕</button>
+        <div class="dscroll"><div class="dbody"></div></div>
+        <div class="dfade"></div>
+        <div class="dhint">‹ click to pin</div>
       </div>
     </section>
 
@@ -569,21 +645,200 @@
         </div>
         <div class="spinelabel"><span class="lab">Tech</span><span class="chev">‹</span></div>
       </div>
+      <div class="display" aria-hidden="true">
+        <button class="dclose" aria-label="Close">✕</button>
+        <div class="dscroll"><div class="dbody"></div></div>
+        <div class="dfade"></div>
+        <div class="dhint">click to pin ›</div>
+      </div>
     </section>
   </div>
+</div>
+
+<!-- ============ Phase 2 content store (verbatim reviews + repo README) ============ -->
+<div id="ext-store" hidden>
+
+  <template id="rv-it-lie"><div class="dv-review">
+    <div class="dv-outlet">The Irish Times</div>
+    <h3>Living Isn’t Easy</h3>
+    <div class="dv-alb">Robocobra Quartet · album review · 2022</div>
+    <p>Thank God for Robocobra Quartet. If they didn’t exist, Irish jazz would have to invent them. Every scene needs its outer limits defined and explored, and for the past decade, drummer Chris Ryan’s ever-shifting Belfast collective have been gamely manning the frontier where jazz and improv meet post-punk, art rock and revolutionary politics.</p>
+    <p>Their 2016 debut, Music for all Occasions, was a liberating blast of drums, bass and horns (guitars are not allowed in the Robocobra universe) that refracted Mingus and Zappa through a Black Flag prism, and the follow-up, 2018′s Plays Hard to Get, expanded their palette further in the studio.</p>
+    <p>Now their third, Living Isn’t Easy, is a proper concept album, a suite of connected sound pictures about the anxieties of modern living that weave Ryan’s spoken-word narrations through layers of groove and horns and spacey synths. Wellness, the album’s second track, was released as a single in April and, while it didn’t exactly trouble the upper reaches of the pop charts, it’s verbatim reading of facile health tips from a magazine article becomes an arch satire on the modern cult of self-actualisation.</p>
+    <p>Beneath the situationist critique, there’s grooves and horns and solos, particularly on the album’s centrepiece, Chromo Sud, that may have Robocobra accused of being, you know, a jazz band, but Living Isn’t Easy probably stands up best as a critique of late capitalism. And God knows we need some of that.</p>
+    <div class="dv-src"><a href="https://www.irishtimes.com/culture/music/review/2022/06/17/robocobra-quartet-living-isnt-easy-the-outer-limits-of-anti-capitalist-irish-jazz/" target="_blank" rel="noopener">Read the full review at The Irish Times ↗</a></div>
+  </div></template>
+
+  <template id="rv-lq-lie"><div class="dv-review">
+    <div class="dv-outlet">Loud &amp; Quiet</div>
+    <h3>Living Isn’t Easy</h3>
+    <div class="dv-alb">Robocobra Quartet · album review · 2022</div>
+    <p>Sometimes things aren’t always as they appear – and this certainly rings true for Belfast’s Robocobra Quartet. Ostensibly a band-cum-art collective, adopting a name seemingly steeped in bohemian irony, they peddle more material for the quotidian post-punk scene so fertile in the grassroots of Northern Ireland’s capital. More latently, however, the group of ex-students of Belfast’s Sonic Arts Research Centre have been curating something altogether more holistic. 2016’s Music for All Occasions, and more recently Plays Hard to Get in 2018, saw the band germinate a signature sound of jazz-motivated, punk-informed, avant-garde spoken word that amassed expansive parallels ranging from Fugazi to Black Country, New Road.</p>
+    <p>2022’s Living Isn’t Easy follows a four-year fallow period, but firmly promises to build on the wide-ranging and well placed foundations of previous works. Vocalist, producer (Just Mustard, NewDad, Junk Drawer), drummer and de-facto spearhead Chris W. Ryan shines most prominently on lead single, ‘Wellness’. Here, his acerbic assessments of influencer health and wellbeing culture are cut out with sarcastic metrical readings of unfortunately very real ‘wellness’ articles, which sound not unlike James Murphy’s second self on LCD Soundsystem’s ‘Losing My Edge’ growing further into neurotic hypochondria.</p>
+    <p>More of the same can be found elsewhere as poetic deliveries nestle aside imposing production and almost referentially encyclopaedic musicianship. These tracks tell a story loosely based around a central character, exploring themes of absurdity and mundanity of modern life, whilst also delving into deeper themes of abuse. Delivering the backbone here are lashing basslines straight out of the D.C. post-hardcore playbook (see ’Flew Close’ and ‘Heaven’), deft drum patterns that would sound at home on any of Charles Mingus’ works (‘Flew Close’), are all housed together with galvanising saxophone and synth sections (‘Plant’ and ‘Chromo Sud’).</p>
+    <p>Here, Robocobra Quartet seemingly operate in perfect balance: musically and lyrically serious, yet also comedic in their experimentation and droll in their delivery. As the recent crest of Irish post-punk bands rummage for a new sound, it seems as though this particular one has struck gold.</p>
+    <div class="dv-src"><a href="https://www.loudandquiet.com/reviews/robocobra-quartet-living-isnt-easy/" target="_blank" rel="noopener">Read the full review at Loud &amp; Quiet ↗</a></div>
+  </div></template>
+
+  <template id="rv-narc-phtg"><div class="dv-review">
+    <div class="dv-outlet">Narc Magazine</div>
+    <h3>Plays Hard to Get</h3>
+    <div class="dv-alb">Robocobra Quartet · album review · Ben Lowes-Smith</div>
+    <p>I was first introduced to Belfast’s Robocobra Quartet as an astonishing live spectacle. Plays Hard To Get is the closest the band have come to capturing their jaw-dropping live presence on record.</p>
+    <p>The movement of the songs is practically symphonic, and each burst of brass or plaintive moment of woodwork feels immaculate. Chris Ryan’s lyrics – closer to the American beat poets of the 1950s than most contemporary rock and pop – are fascinating in their denseness. Moments of lightness steer the record away from the self-indulgence it occasionally threatens; I Shouldn’t Have Watched The Film What Lies Beneath (When I Was Twelve) has a ludicrous, knowing sense of melodrama about it.</p>
+    <p>The album takes disparate influences and assimilates them into something interesting, direct and emotional.</p>
+    <div class="dv-src"><a href="https://narcmagazine.com/album-review-robocobra-quartet-plays-hard-to-get/" target="_blank" rel="noopener">Read the full review at Narc Magazine ↗</a></div>
+  </div></template>
+
+  <template id="rv-dis-phtg"><div class="dv-review">
+    <div class="dv-outlet">Drowned in Sound</div>
+    <h3>Plays Hard to Get</h3>
+    <div class="dv-alb">Robocobra Quartet · album review · 2018</div>
+    <p>Robocobra Quartet exist in liminal space. A perpetually in flux blend of Touch &amp; Go/Dischord-era post-hardcore sits alongside minimal contemporary classical &amp; jazz, very little about what they do should work, and beyond the product of Nineties Louisville weirdness, Rachel’s, there’s little precedent for it. The wrong hands would ham-fist it together into an incongruent mess, riddled with either cliché or impenetrable, directionless meandering. Formed in the small avant-garde hub of Belfast’s Sonic Arts Research Centre, they’re certainly not naïve enough to be considered outsider, nor does some overarching visual conceit play enough of a role to be considered art rock. Die-hard punks would reject them for their composition, while the precedence of spoken word vocals and their adherence to pop convention keeps them out of all but the most liberal jazz club.</p>
+    <p>There’s a moment 40 seconds into Plays Hard To Get, as an ornate Hollywood string section unfurls, where it becomes evident that the Robocobra Quartet heard on this album has underwent substantial evolution since their 2016 debut. “Following loose threads, we spend our teens brushing the dust off brick to uncover some hidden hieroglyphic”, Chris Ryan enunciates, in the first of many punctuation marks in a lengthy dialogue between himself in the present moment, past self, inner monologue and contemporary culture. At the 52-second mark, the pulsing stomp of ‘Short Stretch of Day’ broadens the panorama into the theme for an all-encompassing Adam Curtis-directed blockbuster rumination on humanity. 'I was just trying to write a pop song', Ryan has said of it – true, in a sweeping, orchestral Talk Talk sense.</p>
+    <p>Plays Hard To Get necessitates active listening - few ears will react with passivity to a frontman whose over-enunciated search for truth is as influenced by the curated spontaneity of Stewart Lee’s cadence as it is the Dismemberment Plan’s Travis Morrison. Just as an infatuation with the mind of Mark E. Smith is to appreciating The Fall, so too is drummer, vocalist, and primary composer Chris Ryan’s worldview to Robocobra Quartet. An internal anxiety-symptom checklist, its wandering existential extrapolations often opt to twist the knife rather than indulge in romantic, poetic inclinations that usually accompanies the same feeling on, say, a Nick Cave record.</p>
+    <p>Despite that, it’s kept afloat by enough musical buoyancy to offer respite, as we’re dragged by Ryan on some Quantum Leap arc across zeitgeist snapshots, characters and ciphers (“crack that goal for 1860 Munich”, “Hands on rails/In a regional hospital somewhere”), that incrementally fill in our view of the bigger picture here. A panache for these evocative cultural touchstones and what Chris Morris would call ‘magic words’ disarm, before we’re floored with broad truths (“We’ll find a better use for that unused noose”, “I’m three times the person I used to be, but twice as unsure”).</p>
+    <p>‘You’ll Wade’ and ‘Try Hard’ work as spiritual heirs to to the previous album’s ‘You’ll Shrug’ and ‘Nice Life’, their comment on the unbearable weight of emotional and artistic baggage, the pitfalls of over-reliance, and self-prescribed debts to others, as experienced by today’s adult children - “Hell hath no fury like a scorned hopeful” indeed. As with many of the album’s rock-oriented moments, they’re underpinned via the Fugazian technique of employing bass as hook-laden rhythm guitar, loosely but measuredly introducing flourishes of modern classical instrumentation.</p>
+    <p>Everything on here is transtextual, but for what purpose beyond some indulgent self-constructed artistry? Robocobra Quartet explore the extent to which life can be mined for painstaking, autobiographical art. Both can be a fucking slog, but for those moments of complete, escapist wonder and a fleeting sense of understanding. Whether they arrive with little prescience or crushing inevitability, some uncomfortable truths signposting the way, Robocobra manage it in their measuredly spontaneous moments of humanity.</p>
+    <p>Sometimes those moments arrive in the concession of just one vocal line to melody, or in a moment of outright doom when the clickbait-satisfying bar of ‘Bar 37 Will Shock You!’ arrives, and along with it the cold sweat of that moment of sheer dread upon the crushing realisation that the yearning you feel for those salad days won’t ever be satisfied. Where the band often deliver maxim upon maxim of self-reflection and flagellation, Ryan’s ongoing fascination with pop culture idiom (“It’s been a while since liquid on airlines”) offer another reading that ultimately prods at a broader collective mindset, and it’s here where the heart of Robocobra Quartet’s craft lies.</p>
+    <p>It’s weighty, but in turning its gaze outward and recognition of the power of silence and breathing space for its ensemble, Plays Hard To Get feels leaner and more cohesive than its predecessor, despite a substantially longer runtime. An album that expertly plays on expectation, playing the dynamic long-game and intentionally weaves knots into its tapestraic narrative, Plays Hard To Get is the most daring, fully realised LP to emerge from Ireland this year, and it’s hard to imagine it being topped.</p>
+    <div class="dv-src"><a href="https://drownedinsound.com/releases/20348/reviews/4151829" target="_blank" rel="noopener">Read the full review at Drowned in Sound ↗</a></div>
+  </div></template>
+
+  <template id="rv-quietus-mfao"><div class="dv-review">
+    <div class="dv-outlet">The Quietus</div>
+    <h3>Music for All Occasions</h3>
+    <div class="dv-alb">Robocobra Quartet · album review · 2016</div>
+    <p>With fourteen interchangeable members Robocobra Quartet breach convention not simply in the nominal sense. Since forming in Belfast’s Sonic Arts Research Centre back in 2014, their cunning marriage of jazz, spoken word, punk and avant-garde noise has thrown the cat amongst sleepier circles at home, setting them apart as an act intent on mining meaning from hard-won scope and purview. Led by drummer, vocalist and de facto frontman Chris Ryan, their debut album, Music For All Occasions, is a carefully-crafted release that presents one’s thinly-veiled personal disquiet as a single prism beam bounding from the much bigger picture.</p>
+    <p>Almost symphonic in its poise and flow, Music For All Occasions is a record where even small details are rendered with precision – almost nothing, it seems, is kneejerk; the tangents feel intended. With slick sax and iterative webs of bass and drums wedding to form a strong core throughout, Ryan’s words offer up a narrative that blurs musing doubt, flickers of dead conversation and the dregs of self-conscious recall in masterful fashion. Take opener and lead single ‘Correct’, a track touching on the irreducible triviality of personal endeavor or ‘You’ll Shrug’, an early highlight bowing out in an impressionistic cloud of Mingusesque noise: in much the same way Julia Holter re-frames Woolf’s “incessant shower of innumerable atoms” Ryan’s self-referential scattergraph takes the choking insignificance of even the most throwaway encounter and – just as Enablers’ Pete Simonelli fixates over the madness of nameless characters of the night – sets it all free through song.</p>
+    <p>Musically, it’s controlled experimentation and intuitive economy that underpins the orchestrated praxis: from flurrying jolts of brass that run the gamut from wispy to rapt and bobbing rhythms that unfurl beyond the realm of second-guessing to metrical bass lines that rarely take the easy way out, these nine compositions triumph as a whole by resisting the descent into a blustering miasma of sound each time. From two-minute anti-mantra ‘Find X’ (“find yourself saying the same thing…”) to ‘Nice Life’, a peak about not being able to get out of bed in the morning (“Chris won’t be seeing anyone today, he feels it’s better this way”) Ryan commands more by way of hinting ciphers than outright obscurism, centered above a sound that only imposes itself when due. Composure here is tantamount to cutting loose.</p>
+    <p>But it’s closer ‘Album of the Year’ that sees the modus operandi of the self-released Music For All Occasions as a record – rather than Robocobra Quartet as a live proposition – hit home. Much like Donny McCaslin Quartet’s work on the more downcast moments on Bowie’s Blackstar, its subdued meditation on “that” feeling of disassociation at the tail-end of the year is imbued with a taut musicality – quivering clarinet, chromatic bass inversions, extended piano chords – that knows the inherent value in quietude and pace.</p>
+    <p>With Ryan audibly crying on the track, the unbearable shiteness of being is laid bare: where the severity of the unsaid thing holds its own elsewhere, a hard dose of the realest of real shit does wonders here.</p>
+    <p>Whilst it feels much more like a checkpoint rather than a breathless culmination of the band’s burgeoning trajectory over the last three years, the ambition of Music For All Occasions is concurrently – and fully – realised in its vision and restraint. A record that neither overstays its welcome nor veers into wandering overdulgence, it stands up as the Irish album of 2016, at the very least. Here’s to more.</p>
+    <div class="dv-src"><a href="https://thequietus.com/quietus-reviews/robocobra-quartet-music-for-all-occasions-album-review/" target="_blank" rel="noopener">Read the full review at The Quietus ↗</a></div>
+  </div></template>
+
+  <script type="text/markdown" id="md-rq-viz"># rq-100pieces-viz
+
+Recipe-driven, headless-Blender pipeline that renders petri-dish "bloom reveal" music
+videos for **The 100** (starting with the *Haha* single). Soft "fluffy bloom" colonies
+grow onto a dish to reconstruct a song's artwork, then dissolve away to reveal the real
+photograph underneath — plus stamp-drawing and overlay variants of the same visual world.
+
+Everything a song needs is a small **recipe** (a plate image + a timeline + a few knobs), so
+new songs and new formats are data, not new copies of the code.
+
+## Requirements
+
+- [Blender](https://www.blender.org/) 5.x — the engine runs in Blender's bundled Python
+  (which already includes numpy). Default binary path: `/opt/homebrew/bin/blender`.
+- `ffmpeg` on your `PATH` — used to auto-encode the rendered frames into a master.
+
+Nothing else to install to render. (The test harness has its own deps; see *Tests*.)
+
+## Render a recipe
+
+Arguments go after `--`:
+
+```bash
+# full render (all frames) -> auto-encodes a master into the output dir
+blender --background --python 100pieces.py -- --recipe recipes/haha_landscape.toml --output out/haha
+
+# fast spot-checks
+blender --background --python 100pieces.py -- --recipe recipes/haha_landscape.toml --last --output out/check
+blender --background --python 100pieces.py -- --recipe recipes/haha_vertical.toml --preview --fullres --output out/prev
+```
+
+Modes: `--last` (final frame only), `--preview [--fullres]` (a spread of frames; 40% res
+unless `--fullres`), or no mode flag for the full render. `--output DIR` sets where frames and
+the encoded master go. Frames are `frame_#####.png` (5-digit pad); the master is named after
+the recipe.
+
+## Recipes
+
+A recipe is a TOML file in [`recipes/`](recipes/). It picks a **treatment**, points at an image
+in [`plates/`](plates/), and sets the format and tuning. Fields not given fall back to
+per-treatment defaults (see [`engine/recipe.py`](engine/recipe.py)).
+
+| Treatment | What it does | Background | Encodes |
+|-----------|--------------|-----------|---------|
+| `reveal` | blooms reconstruct the artwork, hold, then dissolve to reveal the photo | grey | H.264 mp4 |
+| `bloom_overlay` | blooms reconstruct the artwork on a transparent film, then hold | transparent | ProRes 4444 mov (alpha) |
+| `stamp` | the stamp letterforms draw themselves in on a transparent film | transparent | ProRes 4444 mov (alpha) |
+| `stamp_blooms` | the stamp draws in with blooms growing everywhere around it | deep orange | frames only |
+
+Shipped recipes: `haha_landscape` (16:9), `haha_vertical` (9:16), `haha_bloom_overlay`
+(1:1), `stamp_white`, `stamp_black`, `stamp_blooms`.
+
+**Two things that used to mean copying a whole script are now recipe fields:**
+
+- **Aspect ratio** — `aspect = "landscape" | "vertical" | "square"` (or `[width, height]`).
+  One engine renders 16:9, 9:16, and 1:1; the dish is fit to the short dimension for any ratio.
+- **Length / warp** — the phase boundaries are stored as *fractions* of the total, so changing
+  `duration_sec` reflows the whole choreography proportionally: the same sequencing of phases,
+  scaled to the new end length. (For a uniform speed-up of an already-rendered sequence, see
+  the legacy `animations/make_short.py`.)
+
+### Add a new song
+
+1. Drop the artwork in `plates/<song>.jpg` (or a stamp mask PNG).
+2. Copy a recipe, e.g. `recipes/haha_landscape.toml` to `recipes/<song>_landscape.toml`, and
+   point `art`/`stamp_image` at your plate. Adjust `duration_sec`, `aspect`, or any knob.
+3. `--preview` it, then do the full render.
+
+## Layout
+
+```
+100pieces.py        entry point (run under Blender)
+engine/
+  core.py           pure math: colour, aspect-ratio, warp/timeline, frame subsample
+  plate.py          pure image analysis: dish detection, seeding, palette, stamp vein walk
+  recipe.py         the Recipe dataclass + TOML loader + per-treatment defaults
+  render.py         the Blender engine: consumes a recipe, builds the scene, renders, encodes
+recipes/            one TOML per song/format
+plates/             committed source images (artwork, stamp mask)
+tests/              unit tests (pure logic) + golden characterization tests (render one frame)
+animations/         LEGACY standalone scripts, kept as historical artifacts (see below)
+```
+
+`engine/core.py` and `engine/plate.py` are deliberately free of `bpy`, so they run — and are
+unit-tested — under a plain Python interpreter; only `engine/render.py` imports Blender.
+
+## Legacy scripts
+
+[`animations/`](animations/) holds the original standalone scripts that produced the released
+Haha renders. They are **kept unchanged as artifacts** — the recipe engine is a clean
+re-implementation for future work, not a replacement of that history. The golden tests render
+one frame of each so they keep working.
+
+## Tests
+
+The suite mixes fast pure-logic unit tests with golden characterization tests that render a
+single frame per treatment (~1–3s each) and compare a downsampled thumbnail, guarding both the
+exact output resolution (aspect ratio) and the visual content.
+
+```bash
+python3 -m venv .venv && .venv/bin/pip install -r requirements-dev.txt
+.venv/bin/python -m pytest            # everything (needs Blender for the golden tests)
+.venv/bin/python -m pytest -m "not blender"   # pure-logic tests only, no Blender needed
+```
+</script>
+
 </div>
 
 <script>
   const stage=document.getElementById('stage');
   const dip=document.getElementById('diptych');
   const mob=()=>window.matchMedia('(max-width:820px)').matches;
-  let focusT=0;
-  function setFocus(side,immediate){
+  const paneArt=document.getElementById('pane-art'),paneTech=document.getElementById('pane-tech');
+  let focusT=0,pinned=false;
+  function setFocus(side,immediate,force){
+    if(pinned&&!force)return;                 // a pinned view holds focus; only pin/unpin may override
     clearTimeout(focusT);
+    if(!pinned){paneArt.classList.remove('has-view');paneTech.classList.remove('has-view');}
     const apply=()=>{stage.classList.remove('focus-art','focus-tech');if(side)stage.classList.add('focus-'+side);};
     if(immediate)apply();else focusT=setTimeout(apply,140);
   }
-  const paneArt=document.getElementById('pane-art'),paneTech=document.getElementById('pane-tech');
   paneArt.addEventListener('mouseenter',()=>{if(!mob())setFocus('art');});
   paneTech.addEventListener('mouseenter',()=>{if(!mob())setFocus('tech');});
   document.getElementById('scroll-art').addEventListener('wheel',()=>{if(!mob())setFocus('art',true);},{passive:true});
@@ -603,12 +858,128 @@
   lb.append(lbimg,lbcap);document.body.appendChild(lb);
   const closeLb=()=>lb.classList.remove('open');
   document.querySelectorAll('.gallery img').forEach(im=>im.addEventListener('click',e=>{
+    if(!mob())return;                 // desktop pins the image into the display pane instead
     e.stopPropagation();lbimg.src=im.src;lbimg.alt=im.alt;
     const fc=im.parentElement.querySelector('figcaption');lbcap.textContent=fc?fc.textContent:'';
     lb.classList.add('open');
   }));
   lb.addEventListener('click',closeLb);
-  document.addEventListener('keydown',e=>{if(e.key==='Escape')closeLb();});
+
+  /* ---- Phase 2: hover-preview / click-pin extended views (desktop only) ---- */
+  const store=document.getElementById('ext-store');
+  const dbodyOf=p=>p.querySelector('.display .dbody');
+  const targetPane=side=>side==='art'?paneTech:paneArt;   // an art item shows on the tech canvas, and vice-versa
+  const sideOf=el=>el.closest('.pane.art')?'art':'tech';
+  const SEL='.repocard, .gallery img, .article > summary, .press-links a[data-review]';
+  const pickSource=t=>t.closest(SEL);
+
+  const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  function inline(s){
+    s=esc(s);
+    s=s.replace(/`([^`]+)`/g,(m,c)=>'<code>'+c+'</code>');
+    s=s.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');
+    s=s.replace(/\*([^*\s][^*]*?)\*/g,'<em>$1</em>');
+    s=s.replace(/\[([^\]]+)\]\(([^)]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>');
+    return s;
+  }
+  function mdToHtml(md){
+    const L=md.replace(/\r/g,'').split('\n');let h='',i=0;
+    const isSpecial=x=>/^(#{1,4}\s|```|\s*[-*]\s|\s*\d+\.\s|>\s?)/.test(x);
+    const isTableSep=(a,b)=>a&&a.includes('|')&&b&&/^\s*\|?[\s:|-]+\|[\s:|-]*$/.test(b);
+    while(i<L.length){
+      let line=L[i];
+      if(/^```/.test(line)){i++;let c=[];while(i<L.length&&!/^```/.test(L[i])){c.push(L[i]);i++;}i++;h+='<pre><code>'+esc(c.join('\n'))+'</code></pre>';continue;}
+      if(/^\s*$/.test(line)){i++;continue;}
+      let m=line.match(/^(#{1,4})\s+(.*)/);
+      if(m){const n=m[1].length;h+='<h'+n+'>'+inline(m[2])+'</h'+n+'>';i++;continue;}
+      if(isTableSep(line,L[i+1])){
+        const row=r=>r.replace(/^\s*\|/,'').replace(/\|\s*$/,'').split('|').map(c=>c.trim());
+        const head=row(line);i+=2;let rows=[];
+        while(i<L.length&&L[i].includes('|')&&!/^\s*$/.test(L[i])){rows.push(row(L[i]));i++;}
+        h+='<table><thead><tr>'+head.map(c=>'<th>'+inline(c)+'</th>').join('')+'</tr></thead><tbody>'+
+           rows.map(r=>'<tr>'+r.map(c=>'<td>'+inline(c)+'</td>').join('')+'</tr>').join('')+'</tbody></table>';continue;
+      }
+      if(/^\s*[-*]\s+/.test(line)){
+        let it=[];while(i<L.length&&(/^\s*[-*]\s+/.test(L[i])||(/^\s{2,}\S/.test(L[i])&&it.length))){
+          if(/^\s*[-*]\s+/.test(L[i]))it.push(L[i].replace(/^\s*[-*]\s+/,''));else it[it.length-1]+=' '+L[i].trim();i++;}
+        h+='<ul>'+it.map(x=>'<li>'+inline(x)+'</li>').join('')+'</ul>';continue;
+      }
+      if(/^\s*\d+\.\s+/.test(line)){
+        let it=[];while(i<L.length&&(/^\s*\d+\.\s+/.test(L[i])||(/^\s{2,}\S/.test(L[i])&&it.length))){
+          if(/^\s*\d+\.\s+/.test(L[i]))it.push(L[i].replace(/^\s*\d+\.\s+/,''));else it[it.length-1]+=' '+L[i].trim();i++;}
+        h+='<ol>'+it.map(x=>'<li>'+inline(x)+'</li>').join('')+'</ol>';continue;
+      }
+      if(/^>\s?/.test(line)){let q=[];while(i<L.length&&/^>\s?/.test(L[i])){q.push(L[i].replace(/^>\s?/,''));i++;}h+='<blockquote>'+inline(q.join(' '))+'</blockquote>';continue;}
+      let para=[line];i++;
+      while(i<L.length&&!/^\s*$/.test(L[i])&&!isSpecial(L[i])&&!isTableSep(L[i],L[i+1])){para.push(L[i]);i++;}
+      h+='<p>'+inline(para.join(' '))+'</p>';
+    }
+    return h;
+  }
+
+  function imgView(img){
+    const cap=img.closest('figure')&&img.closest('figure').querySelector('figcaption');
+    return '<div class="dv-img"><img src="'+img.getAttribute('src')+'" alt="'+(img.getAttribute('alt')||'')+'">'+
+           (cap?'<div class="dv-cap">'+cap.textContent+'</div>':'')+'</div>';
+  }
+  function articleView(det){
+    const t=det.querySelector('.atitle'),y=det.querySelector('.ayr'),b=det.querySelector('.abody');
+    return '<h2 class="dv-head">'+(t?t.textContent:'')+(y?'<span class="dv-yr">'+y.textContent+'</span>':'')+'</h2>'+
+           '<div class="dv-article">'+(b?b.innerHTML:'')+'</div>';
+  }
+  function reviewView(key){const t=store.querySelector('#'+key);return t?t.innerHTML:null;}
+  function repoView(card){
+    const path=card.querySelector('.rc-path'),head='<div class="dv-repohead">◆ <a href="'+card.href+'" target="_blank" rel="noopener">'+(path?path.textContent:card.href)+' ↗</a></div>';
+    const key=card.dataset.readme;
+    if(key){const t=store.querySelector('#'+key);if(t)return '<div class="dv-md">'+head+mdToHtml(t.textContent.trim())+'</div>';}
+    const sub=card.querySelector('.rc-sub'),langs=[...card.querySelectorAll('.rc-langs span')].map(s=>'<code>'+s.textContent+'</code>').join(' ');
+    return '<div class="dv-md">'+head+(sub?'<p>'+sub.textContent+'</p>':'')+(langs?'<p>'+langs+'</p>':'')+'</div>';
+  }
+  function viewFor(src){
+    if(src.matches('.repocard'))return repoView(src);
+    if(src.matches('.gallery img'))return imgView(src);
+    if(src.matches('summary'))return articleView(src.closest('.article'));
+    if(src.matches('a[data-review]'))return reviewView(src.dataset.review);
+    return null;
+  }
+  function renderView(side,html){
+    dbodyOf(targetPane(side)).innerHTML=html;
+    setFocus(side,true,true);
+    paneArt.classList.remove('has-view');paneTech.classList.remove('has-view');
+    targetPane(side).classList.add('has-view');
+  }
+  function unpin(){
+    pinned=false;stage.classList.remove('pinned');
+    paneArt.classList.remove('pinned','has-view');paneTech.classList.remove('pinned','has-view');
+    lastHover=null;
+    setFocus(null,true,true);
+  }
+
+  let lastHover=null;
+  dip.addEventListener('mouseover',e=>{
+    if(mob()||pinned)return;
+    const src=pickSource(e.target);if(!src)return;
+    if(src===lastHover)return;              // moving within the same item: don't re-render
+    const html=viewFor(src);if(html==null)return;
+    lastHover=src;
+    renderView(sideOf(src),html);
+  });
+  dip.addEventListener('mouseleave',()=>{lastHover=null;});
+  dip.addEventListener('click',e=>{
+    if(mob())return;                   // mobile keeps native links / details / lightbox
+    const src=pickSource(e.target);if(!src)return;
+    const html=viewFor(src);if(html==null)return;
+    e.preventDefault();e.stopPropagation();
+    const side=sideOf(src);
+    renderView(side,html);
+    pinned=true;stage.classList.add('pinned');
+    targetPane(side).classList.add('pinned');
+    (side==='art'?paneArt:paneTech).classList.remove('pinned');
+    const sc=targetPane(side).querySelector('.dscroll');if(sc)sc.scrollTop=0;
+  });
+  document.querySelectorAll('.dclose').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();unpin();}));
+  window.addEventListener('resize',()=>{if(mob()&&pinned)unpin();});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeLb();if(pinned)unpin();}});
 </script>
 </body>
 </html>
