@@ -311,7 +311,6 @@
     .stage.focus-art .hero .summary,.stage.focus-tech .hero .summary,
     .stage.focus-art .hero .credit,.stage.focus-tech .hero .credit{display:none}
     .stage.focus-art .hero h1,.stage.focus-tech .hero h1{font-size:19px;margin:0;cursor:pointer;white-space:nowrap}
-    .stage.focus-art .hero .name-reveal,.stage.focus-tech .hero .name-reveal{display:none}   /* slim bar shows plain text */
     .stage.focus-art .hero .mobtabs,.stage.focus-tech .hero .mobtabs{margin-top:0;gap:8px;flex:none}
     .stage.focus-art .hero .mobtabs .mtab,.stage.focus-tech .hero .mobtabs .mtab{flex:0 0 auto;padding:7px 14px;font-size:12.5px;background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.32);color:#fff;-webkit-backdrop-filter:none;backdrop-filter:none}
     .stage.focus-art .hero .mtab[data-side="art"]{background:var(--a-acc);border-color:var(--a-acc);color:#fff}
@@ -1007,7 +1006,7 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements-dev.txt
     const INK='#f6f4ef';                 // warm off-white, matching the hero title
     const STEP=1000/60, MAXSUB=5, DUR=3600;   // ~60s reveal at 60fps, wall-clock paced
     let W=0,H=0,dpr=1,mask=null,edges=[],veins=[],seeded=0,age=0,g=0,fontSize=48;
-    let raf=0,running=false,done=false,started=false,collapsed=false,last=0,acc=0,rt=0;
+    let raf=0,running=false,done=false,started=false,last=0,acc=0,rt=0;
 
     function fontOf(){
       const s=getComputedStyle(h1);
@@ -1071,17 +1070,14 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements-dev.txt
     function kick(){ if(running||done)return; running=true; last=0; acc=0; cancelAnimationFrame(raf); raf=requestAnimationFrame(loop); }
     function settleNow(){ g=1; age=DUR; for(let k=0;k<24000&&!settled();k++) stepVeins(); done=true; }
 
-    function begin(){ if(started||collapsed)return; started=true; if(!build())return; h1.classList.add('canvas-active'); if(reduce)settleNow(); else kick(); }
-    function collapse(){ collapsed=true; cancelAnimationFrame(raf); running=false; done=true; h1.classList.remove('canvas-active'); }
+    function begin(){ if(started)return; started=true; if(!build())return; h1.classList.add('canvas-active'); if(reduce)settleNow(); else kick(); }
 
-    // collapse back to plain text when a mobile tab is chosen (hero shrinks to the slim bar)
-    document.querySelectorAll('.mobtabs .mtab').forEach(b=>b.addEventListener('click',collapse));
-
-    // Rebuild the mask whenever the name's box changes — window resize, orientation, and the
-    // mobile address bar showing/hiding (which resizes the 100svh hero and moves the title).
-    // Progress (age/g) is preserved: it re-seeds to the current point and keeps growing.
+    // Rebuild the mask whenever the name's box changes — window resize, orientation, the mobile
+    // address bar showing/hiding, AND the hero collapsing to / expanding from the slim bar. The
+    // mould stays the name everywhere (never plain text); progress (age/g) is preserved, so it
+    // re-fits to the new size and keeps growing.
     function rebuild(){
-      if(collapsed||!started) return;
+      if(!started) return;
       const wasDone=done;
       veins=[]; seeded=0; done=false; running=false;
       if(!build()) return;                 // fail() draws the plain <h1> fallback
