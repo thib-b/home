@@ -1023,7 +1023,7 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements-dev.txt
     function build(){
       const F=fontOf(); fontSize=F.size;
       const r=h1.getBoundingClientRect();
-      W=Math.max(2,Math.round(r.width||h1.clientWidth||innerWidth));
+      W=measureW();
       const lines=wrap(h1.textContent.trim(),W,F);
       const blockH=Math.ceil(lines.length*F.lh);
       // Derive height from text metrics, not the rect: on mobile Safari the h1's line-box can
@@ -1077,22 +1077,32 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements-dev.txt
     function kick(){ if(running||done)return; running=true; last=0; acc=0; cancelAnimationFrame(raf); raf=requestAnimationFrame(loop); }
     function settleNow(){ g=1; age=DUR; for(let k=0;k<24000&&!settled();k++) stepVeins(); done=true; }
 
-    function begin(){ if(started)return; started=true; if(!build())return; h1.classList.add('canvas-active'); if(reduce)settleNow(); else kick(); }
+    // Width comes from the stable containing block — the h1's own box can collapse to ~0 on
+    // mobile Safari (position:relative flex item with an absolute canvas child).
+    function measureW(){ const c=namewrap.parentElement||namewrap; return Math.max(2,Math.round(c.clientWidth||h1.clientWidth||innerWidth)); }
+    function sizeKey(){ return measureW()+'|'+fontOf().size; }
+    let lastKey='';
 
-    // Rebuild the mask whenever the name's box changes — window resize, orientation, the mobile
-    // address bar showing/hiding, AND the hero collapsing to / expanding from the slim bar. The
-    // mould stays the name everywhere (never plain text); progress (age/g) is preserved, so it
-    // re-fits to the new size and keeps growing.
+    function begin(){ if(started)return; started=true; if(!build())return; lastKey=sizeKey(); h1.classList.add('canvas-active'); if(reduce)settleNow(); else kick(); }
+
+    // Rebuild only when the name's box actually changes size — the hero collapsing to / expanding
+    // from the slim bar, or a real width/orientation change. Crucially this IGNORES resizes that
+    // don't change the box (the mobile address bar showing/hiding, which only changes height), so
+    // the growth keeps accumulating instead of restarting every scroll. Progress is preserved.
     function rebuild(){
       if(!started) return;
+      const k=sizeKey(); if(mask && k===lastKey) return;
+      lastKey=k;
       const wasDone=done;
       veins=[]; seeded=0; done=false; running=false;
       if(!build()) return;                 // fail() draws the plain <h1> fallback
       h1.classList.add('canvas-active');
       if(wasDone||reduce){ settleNow(); } else { last=0; acc=0; kick(); }
     }
-    if('ResizeObserver' in window){ new ResizeObserver(()=>{ clearTimeout(rt); rt=setTimeout(rebuild,160); }).observe(h1); }
-    addEventListener('resize',()=>{ clearTimeout(rt); rt=setTimeout(rebuild,160); });
+    const onResize=()=>{ clearTimeout(rt); rt=setTimeout(rebuild,200); };
+    if('ResizeObserver' in window){ new ResizeObserver(onResize).observe(document.querySelector('.hero')); }
+    addEventListener('resize',onResize);
+    addEventListener('orientationchange',onResize);
 
     const boot=()=>requestAnimationFrame(begin);
     if(document.fonts&&document.fonts.ready){ document.fonts.ready.then(boot); setTimeout(boot,1200); }
