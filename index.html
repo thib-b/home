@@ -1015,7 +1015,7 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements-dev.txt
     const INK='#f6f4ef';                 // warm off-white, matching the hero title
     const STEP=1000/60, MAXSUB=5, DUR=3600;   // ~60s reveal at 60fps, wall-clock paced
     let W=0,H=0,dpr=1,bw=0,bh=0,sx=1,sy=1,mask=null,edges=[],veins=[],seeded=0,age=0,g=0,fontSize=48;
-    let raf=0,running=false,done=false,started=false,last=0,acc=0,rt=0,lastLines=0;
+    let raf=0,running=false,done=false,started=false,last=0,acc=0,rt=0;
 
     function fontOf(){
       const s=getComputedStyle(h1);
@@ -1033,9 +1033,18 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements-dev.txt
     function build(){
       const F=fontOf(); fontSize=F.size;
       const r=h1.getBoundingClientRect();
-      W=measureW();
-      const lines=wrap(h1.textContent.trim(),W,F);
-      lastLines=lines.length;
+      const text=h1.textContent.trim();
+      const nowrap=/nowrap/.test(getComputedStyle(h1).whiteSpace);
+      let lines;
+      if(nowrap){
+        // the collapsed slim header keeps the name on one line — measure it and fit the canvas
+        mx.font=F.font; if('letterSpacing' in mx){try{mx.letterSpacing=F.ls;}catch(e){}}
+        W=Math.max(measureW(), Math.ceil(mx.measureText(text).width)+2);
+        lines=[text];
+      } else {
+        W=measureW();
+        lines=wrap(text,W,F);
+      }
       const blockH=Math.ceil(lines.length*F.lh);
       // Derive height from text metrics, not the rect: on mobile Safari the h1's line-box can
       // collapse to ~0 (it's a position:relative flex item with an absolute canvas child), which
@@ -1116,23 +1125,6 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements-dev.txt
     if('ResizeObserver' in window){ new ResizeObserver(onResize).observe(document.querySelector('.hero')); }
     addEventListener('resize',onResize);
     addEventListener('orientationchange',onResize);
-
-    // TEMP on-device diagnostics: visit /#dbg on the phone to see the real numbers.
-    const DBG=location.hash.indexOf('dbg')>=0; let dbgEl;
-    function dbg(){
-      if(!DBG) return;
-      if(!dbgEl){ dbgEl=document.createElement('div'); dbgEl.style.cssText='position:fixed;left:6px;bottom:6px;z-index:99999;background:rgba(0,0,0,.82);color:#5f5;font:10px/1.35 monospace;white-space:pre;padding:6px 8px;border-radius:4px;pointer-events:none;max-width:94vw'; document.body.appendChild(dbgEl); }
-      const r=h1.getBoundingClientRect(), vv=window.visualViewport, c=namewrap.parentElement;
-      dbgEl.textContent=[
-        'dpr='+window.devicePixelRatio+' cap='+dpr,
-        'win='+innerWidth+'x'+innerHeight+' vv='+(vv?Math.round(vv.width)+'x'+Math.round(vv.height):'-'),
-        'h1rect='+Math.round(r.width)+'x'+Math.round(r.height)+' ctW='+(c?c.clientWidth:0),
-        'canvas='+W+'x'+H+' font='+fontOf().size+' lines='+lastLines,
-        'edges='+edges.length+' g='+g.toFixed(2)+' veins='+veins.length+' seed='+seeded,
-        'run='+running+' done='+done+' started='+started
-      ].join('\n');
-    }
-    if(DBG) setInterval(dbg,400);
 
     const boot=()=>requestAnimationFrame(begin);
     if(document.fonts&&document.fonts.ready){ document.fonts.ready.then(boot); setTimeout(boot,1200); }
