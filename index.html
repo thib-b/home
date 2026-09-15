@@ -292,12 +292,10 @@
     /* landing: hero fills the *visible* screen. svh = smallest (address-bar-shown) viewport,
        so the tabs never fall below the fold; dvh is the fallback for older browsers. */
     .hero{height:100dvh;height:100svh}
-    .hero .wrap{padding:22px 22px 26px}
-    .hero .topbar{flex:none;flex-wrap:wrap;gap:6px 16px}
-    /* middle block takes the slack and shrinks if needed, keeping topbar and tabs in view */
-    .hero .heromid{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;justify-content:center;overflow:hidden}
-    .hero h1{margin-top:0} .hero .summary{font-size:15px;margin-top:10px}
-    .hero .mobtabs{display:flex;flex:none;gap:12px;margin-top:18px}
+    .hero .wrap{padding:20px 22px 24px}
+    .hero .topbar{flex-wrap:wrap;gap:6px 16px}
+    .hero h1{margin-top:0} .hero .summary{font-size:14px;line-height:1.45;margin-top:9px}
+    .hero .mobtabs{display:flex;gap:12px;margin-top:16px}
     .hero .mobtabs .mtab{flex:1;padding:15px 12px;border-radius:12px;font-family:"JetBrains Mono",monospace;font-size:15px;font-weight:600;cursor:pointer;color:#fff;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.4);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
     .hero .mobtabs .mtab[data-side="art"]{border-color:var(--a-acc)}
     .hero .mobtabs .mtab[data-side="tech"]{border-color:var(--t-acc)}
@@ -997,6 +995,7 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements-dev.txt
     const h1=document.querySelector('.hero h1');
     const cv=document.querySelector('.name-reveal');
     if(!h1||!cv) return;
+    const namewrap=cv.parentElement;
     const ctx=cv.getContext('2d');
     const mk=document.createElement('canvas');
     const mx=mk.getContext('2d',{willReadFrequently:true});
@@ -1022,8 +1021,16 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements-dev.txt
     function fail(){ h1.classList.remove('canvas-active'); cv.style.display='none'; done=true; running=false; started=true; }
 
     function build(){
+      const F=fontOf(); fontSize=F.size;
       const r=h1.getBoundingClientRect();
-      W=Math.max(2,Math.round(r.width)); H=Math.max(2,Math.round(r.height));
+      W=Math.max(2,Math.round(r.width||h1.clientWidth||innerWidth));
+      const lines=wrap(h1.textContent.trim(),W,F);
+      const blockH=Math.ceil(lines.length*F.lh);
+      // Derive height from text metrics, not the rect: on mobile Safari the h1's line-box can
+      // collapse to ~0 (it's a position:relative flex item with an absolute canvas child), which
+      // used to build a 1px-tall canvas. Reserve the space on the wrapper so it can't collapse.
+      H=Math.max(Math.round(r.height), blockH, Math.ceil(F.size*1.15));
+      namewrap.style.minHeight=H+'px';
       // cap the buffer resolution — lower on mobile, where fill-rate is the bottleneck (the CSS
       // drop-shadow on the layer, not a per-stroke shadow, keeps the veins legible cheaply)
       dpr=Math.min(devicePixelRatio||1, mob()?1.4:2);
@@ -1031,10 +1038,9 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements-dev.txt
       cv.style.width=W+'px'; cv.style.height=H+'px';
       ctx.setTransform(dpr,0,0,dpr,0,0); ctx.lineCap='round'; ctx.clearRect(0,0,W,H);
       mx.setTransform(dpr,0,0,dpr,0,0); mx.clearRect(0,0,W,H);
-      const F=fontOf(); fontSize=F.size;
       mx.font=F.font; mx.textBaseline='top'; mx.fillStyle='#fff';
       if('letterSpacing' in mx){try{mx.letterSpacing=F.ls;}catch(e){}}
-      const lines=wrap(h1.textContent.trim(),W,F), blockH=lines.length*F.lh, oy=Math.max(0,(H-blockH)/2);
+      const oy=Math.max(0,(H-blockH)/2);
       for(let i=0;i<lines.length;i++) mx.fillText(lines[i],0,oy+i*F.lh+(F.lh-F.size)*0.28);
       let data;
       try{ data=mx.getImageData(0,0,W*dpr,H*dpr).data; }catch(e){ data=null; }
