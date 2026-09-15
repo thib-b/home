@@ -291,11 +291,13 @@
     .stage{background:#17181D}
     /* landing: hero fills the *visible* screen. svh = smallest (address-bar-shown) viewport,
        so the tabs never fall below the fold; dvh is the fallback for older browsers. */
-    .hero{height:100dvh;height:100svh}
-    .hero .wrap{padding:20px 22px 24px}
+    /* height from the real visible viewport (JS sets --appvh = visualViewport.height); svh/dvh fallbacks */
+    .hero{height:100dvh;height:100svh;height:var(--appvh,100svh)}
+    .hero .wrap{padding:20px 22px 94px;justify-content:flex-start}
     .hero .topbar{flex-wrap:wrap;gap:6px 16px}
     .hero h1{margin-top:0} .hero .summary{font-size:14px;line-height:1.45;margin-top:9px}
-    .hero .mobtabs{display:flex;gap:12px;margin-top:16px}
+    /* tabs pinned to the bottom of the visible screen, never pushed below the fold by content */
+    .hero .mobtabs{display:flex;gap:12px;position:absolute;left:22px;right:22px;bottom:24px;margin-top:0}
     .hero .mobtabs .mtab{flex:1;padding:15px 12px;border-radius:12px;font-family:"JetBrains Mono",monospace;font-size:15px;font-weight:600;cursor:pointer;color:#fff;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.4);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
     .hero .mobtabs .mtab[data-side="art"]{border-color:var(--a-acc)}
     .hero .mobtabs .mtab[data-side="tech"]{border-color:var(--t-acc)}
@@ -309,7 +311,7 @@
     .stage.focus-art .hero .summary,.stage.focus-tech .hero .summary,
     .stage.focus-art .hero .credit,.stage.focus-tech .hero .credit{display:none}
     .stage.focus-art .hero h1,.stage.focus-tech .hero h1{font-size:19px;margin:0;cursor:pointer;white-space:nowrap}
-    .stage.focus-art .hero .mobtabs,.stage.focus-tech .hero .mobtabs{margin-top:0;gap:8px;flex:none}
+    .stage.focus-art .hero .mobtabs,.stage.focus-tech .hero .mobtabs{position:static;margin-top:0;gap:8px;flex:none}
     .stage.focus-art .hero .mobtabs .mtab,.stage.focus-tech .hero .mobtabs .mtab{flex:0 0 auto;padding:7px 14px;font-size:12.5px;background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.32);color:#fff;-webkit-backdrop-filter:none;backdrop-filter:none}
     .stage.focus-art .hero .mtab[data-side="art"]{background:var(--a-acc);border-color:var(--a-acc);color:#fff}
     .stage.focus-tech .hero .mtab[data-side="tech"]{background:var(--t-acc);border-color:var(--t-acc);color:#08211c}
@@ -835,6 +837,11 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements-dev.txt
   const stage=document.getElementById('stage');
   const dip=document.getElementById('diptych');
   const mob=()=>window.matchMedia('(max-width:820px)').matches;
+  // Track the *visible* viewport height (excludes the mobile browser chrome) so the landing hero
+  // fits exactly and the tabs sit at the real bottom of the screen.
+  const setVH=()=>{ const h=(window.visualViewport&&window.visualViewport.height)||window.innerHeight; document.documentElement.style.setProperty('--appvh',h+'px'); };
+  setVH(); addEventListener('resize',setVH); addEventListener('orientationchange',setVH);
+  if(window.visualViewport) window.visualViewport.addEventListener('resize',setVH);
   const paneArt=document.getElementById('pane-art'),paneTech=document.getElementById('pane-tech');
   let focusT=0,pinned=false;
   function setFocus(side,immediate,force){
@@ -1008,7 +1015,7 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements-dev.txt
     const INK='#f6f4ef';                 // warm off-white, matching the hero title
     const STEP=1000/60, MAXSUB=5, DUR=3600;   // ~60s reveal at 60fps, wall-clock paced
     let W=0,H=0,dpr=1,mask=null,edges=[],veins=[],seeded=0,age=0,g=0,fontSize=48;
-    let raf=0,running=false,done=false,started=false,last=0,acc=0,rt=0;
+    let raf=0,running=false,done=false,started=false,last=0,acc=0,rt=0,lastLines=0;
 
     function fontOf(){
       const s=getComputedStyle(h1);
@@ -1028,6 +1035,7 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements-dev.txt
       const r=h1.getBoundingClientRect();
       W=measureW();
       const lines=wrap(h1.textContent.trim(),W,F);
+      lastLines=lines.length;
       const blockH=Math.ceil(lines.length*F.lh);
       // Derive height from text metrics, not the rect: on mobile Safari the h1's line-box can
       // collapse to ~0 (it's a position:relative flex item with an absolute canvas child), which
@@ -1104,6 +1112,23 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements-dev.txt
     if('ResizeObserver' in window){ new ResizeObserver(onResize).observe(document.querySelector('.hero')); }
     addEventListener('resize',onResize);
     addEventListener('orientationchange',onResize);
+
+    // TEMP on-device diagnostics: visit /#dbg on the phone to see the real numbers.
+    const DBG=location.hash.indexOf('dbg')>=0; let dbgEl;
+    function dbg(){
+      if(!DBG) return;
+      if(!dbgEl){ dbgEl=document.createElement('div'); dbgEl.style.cssText='position:fixed;left:6px;bottom:6px;z-index:99999;background:rgba(0,0,0,.82);color:#5f5;font:10px/1.35 monospace;white-space:pre;padding:6px 8px;border-radius:4px;pointer-events:none;max-width:94vw'; document.body.appendChild(dbgEl); }
+      const r=h1.getBoundingClientRect(), vv=window.visualViewport, c=namewrap.parentElement;
+      dbgEl.textContent=[
+        'dpr='+window.devicePixelRatio+' cap='+dpr,
+        'win='+innerWidth+'x'+innerHeight+' vv='+(vv?Math.round(vv.width)+'x'+Math.round(vv.height):'-'),
+        'h1rect='+Math.round(r.width)+'x'+Math.round(r.height)+' ctW='+(c?c.clientWidth:0),
+        'canvas='+W+'x'+H+' font='+fontOf().size+' lines='+lastLines,
+        'edges='+edges.length+' g='+g.toFixed(2)+' veins='+veins.length+' seed='+seeded,
+        'run='+running+' done='+done+' started='+started
+      ].join('\n');
+    }
+    if(DBG) setInterval(dbg,400);
 
     const boot=()=>requestAnimationFrame(begin);
     if(document.fonts&&document.fonts.ready){ document.fonts.ready.then(boot); setTimeout(boot,1200); }
