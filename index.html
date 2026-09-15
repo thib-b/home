@@ -1014,7 +1014,7 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements-dev.txt
     const pick=a=>a[(Math.random()*a.length)|0];
     const INK='#f6f4ef';                 // warm off-white, matching the hero title
     const STEP=1000/60, MAXSUB=5, DUR=3600;   // ~60s reveal at 60fps, wall-clock paced
-    let W=0,H=0,dpr=1,mask=null,edges=[],veins=[],seeded=0,age=0,g=0,fontSize=48;
+    let W=0,H=0,dpr=1,bw=0,bh=0,sx=1,sy=1,mask=null,edges=[],veins=[],seeded=0,age=0,g=0,fontSize=48;
     let raf=0,running=false,done=false,started=false,last=0,acc=0,rt=0,lastLines=0;
 
     function fontOf(){
@@ -1043,27 +1043,31 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements-dev.txt
       H=Math.max(Math.round(r.height), blockH, Math.ceil(F.size*1.15));
       namewrap.style.minHeight=H+'px';
       dpr=Math.min(devicePixelRatio||1,2);
-      cv.width=mk.width=W*dpr; cv.height=mk.height=H*dpr;
+      // Integer backing dimensions + exact scale factors. A canvas's real pixel size is an integer,
+      // so W*dpr (non-integer when dpr is e.g. 1.94 on Android) must NOT be used as the getImageData
+      // row stride — that misaligns every row and drops almost all mask pixels. Use bw/sx everywhere.
+      bw=Math.max(1,Math.round(W*dpr)); bh=Math.max(1,Math.round(H*dpr)); sx=bw/W; sy=bh/H;
+      cv.width=mk.width=bw; cv.height=mk.height=bh;
       cv.style.width=W+'px'; cv.style.height=H+'px';
-      ctx.setTransform(dpr,0,0,dpr,0,0); ctx.lineCap='round'; ctx.clearRect(0,0,W,H);
-      mx.setTransform(dpr,0,0,dpr,0,0); mx.clearRect(0,0,W,H);
+      ctx.setTransform(sx,0,0,sy,0,0); ctx.lineCap='round'; ctx.clearRect(0,0,W,H);
+      mx.setTransform(sx,0,0,sy,0,0); mx.clearRect(0,0,W,H);
       mx.font=F.font; mx.textBaseline='top'; mx.fillStyle='#fff';
       if('letterSpacing' in mx){try{mx.letterSpacing=F.ls;}catch(e){}}
       const oy=Math.max(0,(H-blockH)/2);
       for(let i=0;i<lines.length;i++) mx.fillText(lines[i],0,oy+i*F.lh+(F.lh-F.size)*0.28);
       let data;
-      try{ data=mx.getImageData(0,0,W*dpr,H*dpr).data; }catch(e){ data=null; }
+      try{ data=mx.getImageData(0,0,bw,bh).data; }catch(e){ data=null; }
       if(!data){ fail(); return false; }
       mask=data; edges=[];
-      const spx=Math.max(2,Math.round(2*dpr));
-      const A=(px,py)=>{ px=(px*dpr)|0; py=(py*dpr)|0; if(px<0||py<0||px>=W*dpr||py>=H*dpr) return 0; return mask[(py*W*dpr+px)*4+3]; };
-      for(let y=0;y<H;y+=spx/dpr) for(let x=0;x<W;x+=spx/dpr){
-        if(A(x,y)>80){ const d=spx/dpr+1; if(A(x-d,y)<80||A(x+d,y)<80||A(x,y-d)<80||A(x,y+d)<80) edges.push({x,y}); }
+      const step=2;                      // sample every ~2 CSS px
+      const A=(px,py)=>{ px=(px*sx)|0; py=(py*sy)|0; if(px<0||py<0||px>=bw||py>=bh) return 0; return mask[(py*bw+px)*4+3]; };
+      for(let y=0;y<H;y+=step) for(let x=0;x<W;x+=step){
+        if(A(x,y)>80){ const d=step; if(A(x-d,y)<80||A(x+d,y)<80||A(x,y-d)<80||A(x,y+d)<80) edges.push({x,y}); }
       }
       if(!edges.length){ fail(); return false; }
       return true;
     }
-    function inMask(x,y){ if(!mask)return false; const px=(x*dpr)|0,py=(y*dpr)|0; if(px<0||py<0||px>=W*dpr||py>=H*dpr) return false; return mask[(py*W*dpr+px)*4+3]>80; }
+    function inMask(x,y){ if(!mask)return false; const px=(x*sx)|0,py=(y*sy)|0; if(px<0||py<0||px>=bw||py>=bh) return false; return mask[(py*bw+px)*4+3]>80; }
     function seed(){ const p=pick(edges); veins.push({x:p.x,y:p.y,ang:rnd(6.2832),life:rnd(58,28),w:rnd(0.9,0.4)}); }
     function stepVeins(){
       const sp=Math.max(0.55,fontSize*0.02), target=Math.round(edges.length*1.25*g);
