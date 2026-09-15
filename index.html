@@ -304,13 +304,13 @@
     .diptych{display:none}
 
     /* a tab is chosen: hero animates to a slim bar with the name + both tabs */
-    .stage.focus-art .hero,.stage.focus-tech .hero{height:62px}
+    .stage.focus-art .hero,.stage.focus-tech .hero{height:84px}
     .stage.focus-art .hero .scrim,.stage.focus-tech .hero .scrim{background:rgba(18,16,26,.74)}
     .stage.focus-art .hero .wrap,.stage.focus-tech .hero .wrap{position:absolute;inset:0;flex-direction:row;align-items:center;justify-content:space-between;gap:12px;padding:0 16px}
     .stage.focus-art .hero .topbar,.stage.focus-tech .hero .topbar,
     .stage.focus-art .hero .summary,.stage.focus-tech .hero .summary,
     .stage.focus-art .hero .credit,.stage.focus-tech .hero .credit{display:none}
-    .stage.focus-art .hero h1,.stage.focus-tech .hero h1{font-size:19px;margin:0;cursor:pointer;white-space:nowrap}
+    .stage.focus-art .hero h1,.stage.focus-tech .hero h1{font-size:clamp(24px,6vw,34px);margin:0;cursor:pointer;white-space:nowrap}
     .stage.focus-art .hero .mobtabs,.stage.focus-tech .hero .mobtabs{position:static;margin-top:0;gap:8px;flex:none}
     .stage.focus-art .hero .mobtabs .mtab,.stage.focus-tech .hero .mobtabs .mtab{flex:0 0 auto;padding:7px 14px;font-size:12.5px;background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.32);color:#fff;-webkit-backdrop-filter:none;backdrop-filter:none}
     .stage.focus-art .hero .mtab[data-side="art"]{background:var(--a-acc);border-color:var(--a-acc);color:#fff}
